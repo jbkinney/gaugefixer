@@ -1,0 +1,15 @@
+docs/build
+docs/html
+.vscode
+build
+gaugefixer.egg-info/
+__pycache__/
+sandbox/
+*.pyc
+*.pyo
+*.aux
+*.blg
+*.fdb_latexmk
+*.log
+*.out
+*.synctex.gz

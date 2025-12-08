@@ -1,0 +1,281 @@
+\begin{thebibliography}{40}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Barton et~al.(2016)Barton, Leonardis, Coucke, and Cocco]{Barton:2016aa}
+J~P Barton, E~De Leonardis, A~Coucke, and S~Cocco.
+\newblock {ACE: adaptive cluster expansion for maximum entropy graphical model inference}.
+\newblock \emph{Bioinformatics}, 32\penalty0 (20):\penalty0 3089--3097, 2016.
+\newblock ISSN 1367-4803.
+\newblock \doi{10.1093/bioinformatics/btw328}.
+
+\bibitem[Belliveau et~al.(2018)Belliveau, Barnes, Ireland, Jones, Sweredoski, Moradian, Hess, Kinney, and Phillips]{Belliveau2018kr}
+Nathan~M. Belliveau, Stephanie~L. Barnes, William~T. Ireland, Daniel~L. Jones, Michael~J. Sweredoski, Annie Moradian, Sonja Hess, Justin~B. Kinney, and Rob Phillips.
+\newblock Systematic approach for dissecting the molecular mechanisms of transcriptional regulation in bacteria.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 115\penalty0 (21):\penalty0 201722055, 05 2018.
+\newblock ISSN 0027-8424.
+\newblock \doi{10.1073/pnas.1722055115}.
+\newblock Wrote.
+
+\bibitem[Cocco et~al.(2018)Cocco, Feinauer, Figliuzzi, Monasson, and Weigt]{Cocco:2018aa}
+Simona Cocco, Christoph Feinauer, Matteo Figliuzzi, R~Monasson, and Martin Weigt.
+\newblock {Inverse statistical physics of protein sequences: a key issues review}.
+\newblock \emph{Reports on Progress in Physics}, 81\penalty0 (3):\penalty0 032601, 2018.
+\newblock ISSN 0034-4885.
+\newblock \doi{10.1088/1361-6633/aa9965}.
+
+\bibitem[Dupic et~al.(2024)Dupic, Phillips, and Desai]{Dupic2024:aa}
+Thomas Dupic, Angela~M. Phillips, and Michael~M. Desai.
+\newblock {Protein sequence landscapes are not so simple: on reference-free versus reference-based inference}.
+\newblock \emph{bioRxiv}, page 2024.01.29.577800, 2024.
+\newblock \doi{10.1101/2024.01.29.577800}.
+
+\bibitem[Ekeberg et~al.(2013)Ekeberg, L\:{o}vkvist, Lan, Weigt, and Aurell]{Ekeberg:2013bb}
+Magnus Ekeberg, Cecilia L\:{o}vkvist, Yueheng Lan, Martin Weigt, and Erik Aurell.
+\newblock {Improved contact prediction in proteins: Using pseudolikelihoods to infer Potts models}.
+\newblock \emph{Physical Review E}, 87\penalty0 (1):\penalty0 012707, 2013.
+\newblock ISSN 1539-3755.
+\newblock \doi{10.1103/physreve.87.012707}.
+
+\bibitem[Faure and Lehner(2024)]{Faure:2024so}
+Andre~J. Faure and Ben Lehner.
+\newblock {MoCHI}: neural networks to fit interpretable models and quantify energies, energetic couplings, epistasis, and allostery from deep mutational scanning data.
+\newblock \emph{Genome Biology}, 25\penalty0 (1):\penalty0 303, 2024.
+\newblock ISSN 1474-7596.
+\newblock \doi{10.1186/s13059-024-03444-y}.
+
+\bibitem[Faure et~al.(2022)Faure, Domingo, Schmiedel, Hidalgo-Carcedo, Diss, and Lehner]{Faure2022aa}
+Andre~J. Faure, Júlia Domingo, Jörn~M. Schmiedel, Cristina Hidalgo-Carcedo, Guillaume Diss, and Ben Lehner.
+\newblock Mapping the energetic and allosteric landscapes of protein binding domains.
+\newblock \emph{Nature}, 604\penalty0 (7904):\penalty0 175--183, 2022.
+\newblock ISSN 0028-0836.
+\newblock \doi{10.1038/s41586-022-04586-4}.
+
+\bibitem[Faure et~al.(2024)Faure, Lehner, Pina, Colome, and Weghorn]{Faure:2024gy}
+Andre~J. Faure, Ben Lehner, Ver\'{o}nica~Mir\'{o} Pina, Claudia~Serrano Colome, and Donate Weghorn.
+\newblock An extension of the walsh-hadamard transform to calculate and model epistasis in genetic landscapes of arbitrary shape and complexity.
+\newblock \emph{{PLOS} Computational Biology}, 20\penalty0 (5):\penalty0 e1012132, 2024.
+\newblock ISSN 1553-734X.
+\newblock \doi{10.1371/journal.pcbi.1012132}.
+
+\bibitem[Feinauer and Borgonovo(2022)]{Feinauer:2022bb}
+Christoph Feinauer and Emanuele Borgonovo.
+\newblock {Mean Dimension of Generative Models for Protein Sequences}.
+\newblock \emph{bioRxiv}, page 2022.12.12.520028, 2022.
+\newblock \doi{10.1101/2022.12.12.520028}.
+
+\bibitem[Feinauer et~al.(2022)Feinauer, Meynard-Piganeau, and Lucibello]{Feinauer:2022aa}
+Christoph Feinauer, Barthelemy Meynard-Piganeau, and Carlo Lucibello.
+\newblock {Interpretable pairwise distillations for generative protein sequence models}.
+\newblock \emph{PLoS Computational Biology}, 18\penalty0 (6):\penalty0 e1010219, 2022.
+\newblock ISSN 1553-734X.
+\newblock \doi{10.1371/journal.pcbi.1010219}.
+
+\bibitem[Gerardos et~al.(2022)Gerardos, Dietler, and Bitbol]{Gerardos:2022aa}
+Andonis Gerardos, Nicola Dietler, and Anne-Florence Bitbol.
+\newblock {Correlations from structure and phylogeny combine constructively in the inference of protein partners from sequences}.
+\newblock \emph{PLoS Computational Biology}, 18\penalty0 (5):\penalty0 e1010147, 2022.
+\newblock ISSN 1553-734X.
+\newblock \doi{10.1371/journal.pcbi.1010147}.
+
+\bibitem[Haldane and Levy(2019)]{Haldane:2019di}
+Allan Haldane and Ronald~M. Levy.
+\newblock {Influence of multiple-sequence-alignment depth on Potts statistical models of protein covariation}.
+\newblock \emph{Physical Review E}, 99\penalty0 (3):\penalty0 032405, 2019.
+\newblock ISSN 2470-0045.
+\newblock \doi{10.1103/physreve.99.032405}.
+
+\bibitem[Hopf et~al.(2017)Hopf, Ingraham, Poelwijk, Schärfe, Springer, Sander, and Marks]{Hopf2017}
+Thomas~A Hopf, John~B Ingraham, Frank~J Poelwijk, Charlotta P~I Schärfe, Michael Springer, Chris Sander, and Debora~S Marks.
+\newblock Mutation effects predicted from sequence co-variation.
+\newblock \emph{Nature Biotechnology}, 35\penalty0 (2):\penalty0 128--135, February 2017.
+\newblock ISSN 1087-0156, 1546-1696.
+\newblock \doi{10.1038/nbt.3769}.
+
+\bibitem[Hsu et~al.(2022)Hsu, Nisonoff, Fannjiang, and Listgarten]{Hsu:2022ek}
+Chloe Hsu, Hunter Nisonoff, Clara Fannjiang, and Jennifer Listgarten.
+\newblock {Learning protein fitness models from evolutionary and assay-labeled data}.
+\newblock \emph{Nature Biotechnology}, 40\penalty0 (7):\penalty0 1114--1122, 2022.
+\newblock ISSN 1087-0156.
+\newblock \doi{10.1038/s41587-021-01146-5}.
+
+\bibitem[Jackson and Okun(2001)]{Jackson2001dk}
+J.~D. Jackson and L.~B. Okun.
+\newblock Historical roots of gauge invariance.
+\newblock \emph{Reviews of Modern Physics}, 73\penalty0 (3):\penalty0 663--680, 2001.
+\newblock ISSN 0034-6861.
+\newblock \doi{10.1103/revmodphys.73.663}.
+
+\bibitem[Kinney and {McCandlish}(2019)]{Kinney2019jc}
+Justin~B Kinney and David~M {McCandlish}.
+\newblock Massively parallel assays and quantitative sequence-function relationships.
+\newblock \emph{Annual Review of Genomics and Human Genetics}, 20\penalty0 (1):\penalty0 99--127, 08 2019.
+\newblock ISSN 1527-8204.
+\newblock \doi{10.1146/annurev-genom-083118-014845}.
+\newblock Wrote.
+
+\bibitem[Kinney et~al.(2007)Kinney, Tkacik, and Callan]{Kinney:2007dh}
+Justin~B. Kinney, Gasper Tkacik, and Curtis~G. Callan.
+\newblock {Precise physical models of protein-DNA interaction from high-throughput data}.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 104\penalty0 (2):\penalty0 501--506, 01 2007.
+\newblock ISSN 0027-8424.
+\newblock \doi{10.1073/pnas.0609908104}.
+\newblock Wrote.
+
+\bibitem[Kinney et~al.(2010)Kinney, Murugan, Callan, and Cox]{Kinney2010tn}
+Justin~B. Kinney, Anand Murugan, Curtis~G. Callan, and Edward~C. Cox.
+\newblock Using deep sequencing to characterize the biophysical mechanism of a transcriptional regulatory sequence.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 107\penalty0 (20):\penalty0 9158--9163, 05 2010.
+\newblock ISSN 0027-8424.
+\newblock \doi{10.1073/pnas.1004290107}.
+\newblock Wrote.
+
+\bibitem[Koo et~al.(2021)Koo, Majdandzic, Ploenzke, Anand, and Paul]{Koo2021}
+Peter~K. Koo, Antonio Majdandzic, Matthew Ploenzke, Praveen Anand, and Steffan~B. Paul.
+\newblock Global importance analysis: {An} interpretability method to quantify importance of genomic features in deep neural networks.
+\newblock \emph{PLOS Computational Biology}, 17\penalty0 (5):\penalty0 e1008925, May 2021.
+\newblock ISSN 1553-7358.
+\newblock \doi{10.1371/journal.pcbi.1008925}.
+\newblock Publisher: Public Library of Science.
+
+\bibitem[Kuo et~al.(2020)Kuo, Jahn, Cheng, Chen, Lee, Hollfelder, Wen, and Chou]{Kuo2020}
+Syue~Ting Kuo, Ruey~Lin Jahn, Yuan~Ju Cheng, Yi~Lan Chen, Yun~Ju Lee, Florian Hollfelder, Jin~Der Wen, and Hsin Hung~David Chou.
+\newblock Global fitness landscapes of the {Shine}-{Dalgarno} sequence.
+\newblock \emph{Genome Research}, 30\penalty0 (5):\penalty0 711--723, 2020.
+\newblock ISSN 15495469.
+\newblock \doi{10.1101/gr.260182.119}.
+
+\bibitem[Marks et~al.(2011)Marks, Colwell, Sheridan, Hopf, Pagnani, Zecchina, and Sander]{Marks:2011aa}
+Debora~S. Marks, Lucy~J. Colwell, Robert Sheridan, Thomas~A. Hopf, Andrea Pagnani, Riccardo Zecchina, and Chris Sander.
+\newblock {Protein 3D Structure Computed from Evolutionary Sequence Variation}.
+\newblock \emph{PLoS ONE}, 6\penalty0 (12):\penalty0 e28766, 2011.
+\newblock \doi{10.1371/journal.pone.0028766}.
+
+\bibitem[Marks et~al.(2012)Marks, Hopf, and Sander]{Marks2012}
+Debora~S Marks, Thomas~A Hopf, and Chris Sander.
+\newblock Protein structure prediction from sequence variation.
+\newblock \emph{Nature Biotechnology}, 30\penalty0 (11):\penalty0 1072--1080, November 2012.
+\newblock ISSN 1087-0156, 1546-1696.
+\newblock \doi{10.1038/nbt.2419}.
+
+\bibitem[Martí-Gómez et~al.(2025)Martí-Gómez, Zhou, Chen, Kinney, and {McCandlish}]{MartiGomez2025aa}
+Carlos Martí-Gómez, Juannan Zhou, Wei-Chia Chen, Justin~B. Kinney, and David~M. {McCandlish}.
+\newblock Inference and visualization of complex genotype-phenotype maps with gpmap-tools.
+\newblock \emph{{bioRxiv}}, page 2025.03.09.642267, 2025.
+\newblock \doi{10.1101/2025.03.09.642267}.
+
+\bibitem[Mogno et~al.(2013)Mogno, Kwasnieski, and Cohen]{Mogno2013cf}
+Ilaria Mogno, Jamie~C Kwasnieski, and Barak~A Cohen.
+\newblock Massively parallel synthetic promoter assays reveal the in vivo effects of binding site variants.
+\newblock \emph{Genome Res}, 23\penalty0 (11):\penalty0 1908 -- 1915, 2013.
+\newblock ISSN 1088-9051.
+\newblock \doi{10.1101/gr.157891.113}.
+
+\bibitem[Otwinowski et~al.(2018)Otwinowski, {McCandlish}, and Plotkin]{Otwinowski2018jj}
+Jakub Otwinowski, David~M {McCandlish}, and Joshua~B Plotkin.
+\newblock Inferring the shape of global epistasis.
+\newblock \emph{Proc Natl Acad Sci {USA}}, 115\penalty0 (32):\penalty0 E7550 -- E7558, 2018.
+\newblock ISSN 0027-8424.
+\newblock \doi{10.1073/pnas.1804015115}.
+
+\bibitem[Park et~al.(2023)Park, Metzger, and Thornton]{Park:2023aa}
+Yeonwoo Park, Brian~P.H. Metzger, and Joseph~W. Thornton.
+\newblock {The simplicity of protein sequence-function relationships}.
+\newblock \emph{bioRxiv}, page 2023.09.02.556057, 2023.
+\newblock \doi{10.1101/2023.09.02.556057}.
+
+\bibitem[Petti et~al.(2025)Petti, Martí-Gómez, Kinney, Zhou, and {McCandlish}]{Petti2025aa}
+Samantha Petti, Carlos Martí-Gómez, Justin~B Kinney, Juannan Zhou, and David~M {McCandlish}.
+\newblock On learning functions over biological sequence space: relating gaussian process priors, regularization, and gauge fixing.
+\newblock \emph{{arXiv}}, 2025.
+\newblock \doi{10.48550/arxiv.2504.19034}.
+
+\bibitem[Poelwijk et~al.(2019)Poelwijk, Socolich, and Ranganathan]{Poelwijk2019gy}
+Frank~J Poelwijk, Michael Socolich, and Rama Ranganathan.
+\newblock Learning the pattern of epistasis linking genotype and phenotype in a protein.
+\newblock \emph{Nature Communications}, 10\penalty0 (1):\penalty0 4213, 2019.
+\newblock \doi{10.1038/s41467-019-12130-8}.
+
+\bibitem[Posfai et~al.(2025{\natexlab{a}})Posfai, {McCandlish}, and Kinney]{Posfai2025bb}
+Anna Posfai, David~M. {McCandlish}, and Justin~B. Kinney.
+\newblock Symmetry, gauge freedoms, and the interpretability of sequence-function relationships.
+\newblock \emph{Physical Review Research}, 7\penalty0 (2):\penalty0 023005, 2025{\natexlab{a}}.
+\newblock \doi{10.1103/physrevresearch.7.023005}.
+
+\bibitem[Posfai et~al.(2025{\natexlab{b}})Posfai, Zhou, {McCandlish}, and Kinney]{Posfai2025aa}
+Anna Posfai, Juannan Zhou, David~M. {McCandlish}, and Justin~B. Kinney.
+\newblock Gauge fixing for sequence-function relationships.
+\newblock \emph{{PLOS} Computational Biology}, 21\penalty0 (3):\penalty0 e1012818, 2025{\natexlab{b}}.
+\newblock ISSN 1553-734X.
+\newblock \doi{10.1371/journal.pcbi.1012818}.
+
+\bibitem[Rube et~al.(2022)Rube, Rastogi, Feng, Kribelbauer, Li, Becerra, Melo, Do, Li, Adam, Shah, Mann, and Bussemaker]{Rube:2022ye}
+H.~Tomas Rube, Chaitanya Rastogi, Siqian Feng, Judith~F. Kribelbauer, Allyson Li, Basheer Becerra, Lucas A.~N. Melo, Bach~Viet Do, Xiaoting Li, Hammaad~H. Adam, Neel~H. Shah, Richard~S. Mann, and Harmen~J. Bussemaker.
+\newblock {Prediction of protein-ligand binding affinity from sequencing data with interpretable machine learning}.
+\newblock \emph{Nature Biotechnology}, 40\penalty0 (10):\penalty0 1520--1527, 2022.
+\newblock ISSN 1087-0156.
+\newblock \doi{10.1038/s41587-022-01307-0}.
+
+\bibitem[Shine and Dalgarno(1975)]{Shine1975}
+J~Shine and L~Dalgarno.
+\newblock Determinant of cistron specificity in bacterial ribosomes.
+\newblock \emph{Nature}, 254:\penalty0 34--38, 1975.
+
+\bibitem[Stormo(2011)]{Stormo:2011jb}
+Gary~D Stormo.
+\newblock {Maximally efficient modeling of DNA sequence motifs at all levels of complexity.}
+\newblock \emph{Genetics}, 187\penalty0 (4):\penalty0 1219 -- 1224, 2011.
+\newblock ISSN 0016-6731.
+\newblock \doi{10.1534/genetics.110.126052}.
+
+\bibitem[Stormo(2013)]{Stormo2013}
+Gary~D. Stormo.
+\newblock Modeling the specificity of protein‐{DNA} interactions.
+\newblock \emph{Quantitative Biology}, 1\penalty0 (2):\penalty0 115--130, June 2013.
+\newblock ISSN 2095-4689, 2095-4697.
+\newblock \doi{10.1007/s40484-013-0012-4}.
+
+\bibitem[Tareen et~al.(2022)Tareen, Kooshkbaghi, Posfai, Ireland, {McCandlish}, and Kinney]{Tareen2022dh}
+Ammar Tareen, Mahdi Kooshkbaghi, Anna Posfai, William~T. Ireland, David~M. {McCandlish}, and Justin~B. Kinney.
+\newblock {MAVE}-{NN}: learning genotype-phenotype maps from multiplex assays of variant effect.
+\newblock \emph{Genome Biology}, 23\penalty0 (1):\penalty0 98, 2022.
+\newblock ISSN 1474-7596.
+\newblock \doi{10.1186/s13059-022-02661-7}.
+
+\bibitem[Weigt et~al.(2009)Weigt, White, Szurmant, Hoch, and Hwa]{Weigt:2009th}
+Martin Weigt, Robert~A. White, Hendrik Szurmant, James~A. Hoch, and Terence Hwa.
+\newblock {Identification of direct residue contacts in protein-protein interaction by message passing}.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 106\penalty0 (1):\penalty0 67--72, 2009.
+\newblock ISSN 0027-8424.
+\newblock \doi{10.1073/pnas.0805923106}.
+
+\bibitem[Yeo and Burge(2004)]{Yeo2004}
+Gene Yeo and Christopher~B Burge.
+\newblock Maximum entropy modeling of short sequence motifs with applications to {RNA} splicing signals.
+\newblock In \emph{Journal of {Computational} {Biology}}, volume~11, pages 377--394, March 2004.
+\newblock \doi{10.1089/1066527041410418}.
+\newblock Issue: 2-3 ISSN: 10665277.
+
+\bibitem[Zamuner and Rios(2021)]{Zamuner:2021gy}
+Stefano Zamuner and Paolo De~Los Rios.
+\newblock {Interpretable Neural Networks based classifiers for categorical inputs}.
+\newblock \emph{arXiv}, 2021.
+\newblock \doi{10.48550/arxiv.2102.03202}.
+
+\bibitem[Zhou et~al.(2022)Zhou, Wong, Chen, Krainer, Justin, and Mccandlish]{Zhou2022}
+Juannan Zhou, Mandy~S Wong, Wei-chia Chen, Adrian~R Krainer, B~Justin, and David~M Mccandlish.
+\newblock Higher-order epistasis and phenotypic prediction.
+\newblock \emph{Proc. Natl. Acad. Sci. USA}, 119\penalty0 (39), 2022.
+\newblock \doi{https://doi.org/10.1073/pnas.2204233119}.
+
+\bibitem[Zhou et~al.(2025)Zhou, Martí-Gómez, Petti, and McCandlish]{Zhou2025}
+Juannan Zhou, Carlos Martí-Gómez, Samantha Petti, and David~M. McCandlish.
+\newblock Learning sequence-function relationships with scalable, interpretable {Gaussian} processes.
+\newblock \emph{eLife}, 14, November 2025.
+\newblock \doi{10.7554/eLife.108964.1}.
+\newblock Publisher: eLife Sciences Publications Limited.
+
+\end{thebibliography}
