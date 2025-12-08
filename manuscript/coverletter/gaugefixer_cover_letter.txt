@@ -1,0 +1,36 @@
+Justin B. Kinney, PhD
+Associate Professor
+Simons Center for Quantitative Biology
+Cold Spring Harbor Laboratory
+Phone: 631-897-5731
+Email: jkinney@cshl.edu
+
+[DATE]
+
+Subject: Manuscript submission to Bioinformatics
+
+Dear Editor,
+
+My colleagues and I kindly ask that you consider our manuscript, "GaugeFixer: overcoming parameter non-identifiability in models of sequence-function relationships," for publication as an Application Note in Bioinformatics.
+
+Mathematical models that describe sequence-function relationships are widely used in computational biology, from predicting transcription factor binding sites to modeling the effects of genetic variation on protein function. A fundamental challenge when interpreting these models is that their parameters are often not uniquely determined by the data—a problem known as gauge freedom. Before parameter values can be meaningfully interpreted or compared across models, these ambiguities must be resolved through a procedure called gauge fixing. Despite the importance of this issue, no general-purpose computational tools for gauge fixing have been available.
+
+Our manuscript introduces GaugeFixer, an open-source Python package that addresses this need. GaugeFixer implements a computationally efficient algorithm that exploits the Kronecker factorization of projection operators to achieve linear scaling in both memory and computation time. This represents a dramatic improvement over direct matrix multiplication, which scales quadratically with the number of model parameters. GaugeFixer thus enables rapid gauge fixing for models with millions of parameters—a task that would otherwise be computationally infeasible.
+
+To demonstrate the utility of GaugeFixer, we analyze a fitness landscape for Shine-Dalgarno sequences comprising nearly 2 million parameters. This analysis reveals how ribosome binding preferences vary across different registers relative to the start codon, illustrating how GaugeFixer can aid the interpretation of complex sequence-function relationships.
+
+We have taken care to make GaugeFixer robust and user-friendly. The package is compatible with Python 3.10 and later, can be installed using pip, and is available under an open-source license on GitHub (http://github.com/jbkinney/gaugefixer). Comprehensive documentation and tutorials are provided at http://gaugefixer.readthedocs.io.
+
+We suggest the following experts as potential reviewers:
+
+•	Donate Weghorn, CRG Barcelona, donate.weghorn@crg.eu
+•	Michael Desai, Harvard University, mdesai@oeb.harvard.edu
+•	Anne-Florence Bitbol, EPFL, anne-florence.bitbol@epfl.ch
+•	Harmen Bussemaker, Columbia University, hjb2004@columbia.edu
+•	Armita Nourmohammad, University of Washington, armita@uw.edu
+
+Thank you for your attention to this matter. My coauthors and I look forward to receiving your assessment.
+
+Sincerely,
+
+Justin B. Kinney, PhD
