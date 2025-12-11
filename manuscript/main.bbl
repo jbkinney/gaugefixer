@@ -1,4 +1,4 @@
-\begin{thebibliography}{40}
+\begin{thebibliography}{42}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -18,7 +18,6 @@ Nathan~M. Belliveau, Stephanie~L. Barnes, William~T. Ireland, Daniel~L. Jones, M
 \newblock \emph{Proceedings of the National Academy of Sciences}, 115\penalty0 (21):\penalty0 201722055, 05 2018.
 \newblock ISSN 0027-8424.
 \newblock \doi{10.1073/pnas.1722055115}.
-\newblock Wrote.
 
 \bibitem[Cocco et~al.(2018)Cocco, Feinauer, Figliuzzi, Monasson, and Weigt]{Cocco:2018aa}
 Simona Cocco, Christoph Feinauer, Matteo Figliuzzi, R~Monasson, and Martin Weigt.
@@ -115,7 +114,6 @@ Justin~B Kinney and David~M {McCandlish}.
 \newblock \emph{Annual Review of Genomics and Human Genetics}, 20\penalty0 (1):\penalty0 99--127, 08 2019.
 \newblock ISSN 1527-8204.
 \newblock \doi{10.1146/annurev-genom-083118-014845}.
-\newblock Wrote.
 
 \bibitem[Kinney et~al.(2007)Kinney, Tkacik, and Callan]{Kinney:2007dh}
 Justin~B. Kinney, Gasper Tkacik, and Curtis~G. Callan.
@@ -123,7 +121,6 @@ Justin~B. Kinney, Gasper Tkacik, and Curtis~G. Callan.
 \newblock \emph{Proceedings of the National Academy of Sciences}, 104\penalty0 (2):\penalty0 501--506, 01 2007.
 \newblock ISSN 0027-8424.
 \newblock \doi{10.1073/pnas.0609908104}.
-\newblock Wrote.
 
 \bibitem[Kinney et~al.(2010)Kinney, Murugan, Callan, and Cox]{Kinney2010tn}
 Justin~B. Kinney, Anand Murugan, Curtis~G. Callan, and Edward~C. Cox.
@@ -131,7 +128,6 @@ Justin~B. Kinney, Anand Murugan, Curtis~G. Callan, and Edward~C. Cox.
 \newblock \emph{Proceedings of the National Academy of Sciences}, 107\penalty0 (20):\penalty0 9158--9163, 05 2010.
 \newblock ISSN 0027-8424.
 \newblock \doi{10.1073/pnas.1004290107}.
-\newblock Wrote.
 
 \bibitem[Koo et~al.(2021)Koo, Majdandzic, Ploenzke, Anand, and Paul]{Koo2021}
 Peter~K. Koo, Antonio Majdandzic, Matthew Ploenzke, Praveen Anand, and Steffan~B. Paul.
@@ -139,7 +135,6 @@ Peter~K. Koo, Antonio Majdandzic, Matthew Ploenzke, Praveen Anand, and Steffan~B
 \newblock \emph{PLOS Computational Biology}, 17\penalty0 (5):\penalty0 e1008925, May 2021.
 \newblock ISSN 1553-7358.
 \newblock \doi{10.1371/journal.pcbi.1008925}.
-\newblock Publisher: Public Library of Science.
 
 \bibitem[Kuo et~al.(2020)Kuo, Jahn, Cheng, Chen, Lee, Hollfelder, Wen, and Chou]{Kuo2020}
 Syue~Ting Kuo, Ruey~Lin Jahn, Yuan~Ju Cheng, Yi~Lan Chen, Yun~Ju Lee, Florian Hollfelder, Jin~Der Wen, and Hsin Hung~David Chou.
@@ -167,6 +162,11 @@ Carlos Martí-Gómez, Juannan Zhou, Wei-Chia Chen, Justin~B. Kinney, and David~M
 \newblock \emph{{bioRxiv}}, page 2025.03.09.642267, 2025.
 \newblock \doi{10.1101/2025.03.09.642267}.
 
+\bibitem[Metzger et~al.(2024)Metzger, Park, Starr, and Thornton]{metzger2024epistasis}
+Brian~PH Metzger, Yeonwoo Park, Tyler~N Starr, and Joseph~W Thornton.
+\newblock Epistasis facilitates functional evolution in an ancient transcription factor.
+\newblock \emph{Elife}, 12:\penalty0 RP88737, 2024.
+
 \bibitem[Mogno et~al.(2013)Mogno, Kwasnieski, and Cohen]{Mogno2013cf}
 Ilaria Mogno, Jamie~C Kwasnieski, and Barak~A Cohen.
 \newblock Massively parallel synthetic promoter assays reveal the in vivo effects of binding site variants.
@@ -181,11 +181,17 @@ Jakub Otwinowski, David~M {McCandlish}, and Joshua~B Plotkin.
 \newblock ISSN 0027-8424.
 \newblock \doi{10.1073/pnas.1804015115}.
 
-\bibitem[Park et~al.(2023)Park, Metzger, and Thornton]{Park:2023aa}
+\bibitem[Park et~al.(2024{\natexlab{a}})Park, Metzger, and Thornton]{Park2024.09.17.613512}
 Yeonwoo Park, Brian~P.H. Metzger, and Joseph~W. Thornton.
-\newblock {The simplicity of protein sequence-function relationships}.
-\newblock \emph{bioRxiv}, page 2023.09.02.556057, 2023.
-\newblock \doi{10.1101/2023.09.02.556057}.
+\newblock On the analysis of protein genetic architecture: Response to {\textquotedblleft}protein sequence landscapes are not so simple{\textquotedblright}.
+\newblock \emph{bioRxiv}, 2024{\natexlab{a}}.
+\newblock \doi{10.1101/2024.09.17.613512}.
+\newblock URL \url{https://www.biorxiv.org/content/early/2024/12/06/2024.09.17.613512}.
+
+\bibitem[Park et~al.(2024{\natexlab{b}})Park, Metzger, and Thornton]{Park:2023aa}
+Yeonwoo Park, Brian~PH Metzger, and Joseph~W Thornton.
+\newblock The simplicity of protein sequence-function relationships.
+\newblock \emph{Nature Communications}, 15\penalty0 (1):\penalty0 7953, 2024{\natexlab{b}}.
 
 \bibitem[Petti et~al.(2025)Petti, Martí-Gómez, Kinney, Zhou, and {McCandlish}]{Petti2025aa}
 Samantha Petti, Carlos Martí-Gómez, Justin~B Kinney, Juannan Zhou, and David~M {McCandlish}.
@@ -257,7 +263,6 @@ Gene Yeo and Christopher~B Burge.
 \newblock Maximum entropy modeling of short sequence motifs with applications to {RNA} splicing signals.
 \newblock In \emph{Journal of {Computational} {Biology}}, volume~11, pages 377--394, March 2004.
 \newblock \doi{10.1089/1066527041410418}.
-\newblock Issue: 2-3 ISSN: 10665277.
 
 \bibitem[Zamuner and Rios(2021)]{Zamuner:2021gy}
 Stefano Zamuner and Paolo De~Los Rios.
@@ -276,6 +281,5 @@ Juannan Zhou, Carlos Martí-Gómez, Samantha Petti, and David~M. McCandlish.
 \newblock Learning sequence-function relationships with scalable, interpretable {Gaussian} processes.
 \newblock \emph{eLife}, 14, November 2025.
 \newblock \doi{10.7554/eLife.108964.1}.
-\newblock Publisher: eLife Sciences Publications Limited.
 
 \end{thebibliography}

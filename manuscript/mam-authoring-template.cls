@@ -999,7 +999,7 @@
 \newcommand\refname{References}
 \newcommand\bibname{References}
 \newcommand\indexname{Index}
-\newcommand\figurename{Fig.}
+\newcommand\figurename{Figure}
 \newcommand\tablename{Table}
 
 \newcommand{\clearemptydoublepage}{\newpage{\pagestyle{empty}\cleardoublepage}}
