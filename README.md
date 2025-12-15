@@ -8,7 +8,7 @@ Create a new python environment with conda and activate it
 
 ```bash
 conda create -n gaugefixer python=3.10
-conda activate gauge
+conda activate gaugefixer
 ```
 
 ### Users
