@@ -57,12 +57,14 @@ Citation
 ========
 
 - Carlos Martí-Gómez, David M. McCandlish, Justin B. Kinney (2025).
-  GaugeFixer: Removing unconstrained degrees of freedom in sequence-function relationships. 
-  In preparation.
+  GaugeFixer: Removing unconstrained degrees of freedom in sequence-function relationships. bioRxiv.
+  `doi.org/10.64898/2025.12.08.693054 <https://www.biorxiv.org/content/10.64898/2025.12.08.693054v2>`_
 
 .. toctree::
         :maxdepth: 1
         :caption: Table of Contents
 
         usage/tutorial.ipynb
+        usage/benchmarking.ipynb
+        usage/example.ipynb
         api
