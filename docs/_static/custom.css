@@ -1,0 +1,26 @@
+/* Custom CSS for GaugeFixer documentation */
+
+/* Match the PoolParty sidebar logo treatment. */
+.wy-side-nav-search {
+    background-color: #ffffff;
+}
+
+.wy-side-nav-search > a {
+    font-size: 0;
+}
+
+.wy-side-nav-search > a .icon-home:before {
+    content: none;
+}
+
+.wy-side-nav-search > a img.logo {
+    display: block;
+}
+
+.wy-side-nav-search > div.version {
+    display: none;
+}
+
+.wy-side-nav-search .switch-menus {
+    display: none;
+}
