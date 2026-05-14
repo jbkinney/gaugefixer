@@ -8,7 +8,7 @@ Create a new python environment with conda and activate it
 
 ```bash
 conda create -n gaugefixer python=3.10
-conda activate gauge
+conda activate gaugefixer
 ```
 
 ### Users
@@ -56,4 +56,4 @@ See the LICENSE file for details.
 
 Carlos Martí-Gómez, David M. McCandlish, Justin B. Kinney (2025).
 GaugeFixer: Removing unconstrained degrees of freedom in sequence-function relationships. 
-In preparation.
+[bioRxiv](https://www.biorxiv.org/content/10.64898/2025.12.08.693054v2).
