@@ -16,6 +16,9 @@ from gaugefixer.utils import (
     sorted_tuples,
     validate_alphabet_params,
     get_all_seqs,
+    get_position_basis,
+    get_orbits_subsequences,
+    get_suborbits_subsequences,
 )
 
 
@@ -29,6 +32,11 @@ class UtilsTests(unittest.TestCase):
         m = get_site_projection_matrix(pi_lc, lda)
         assert np.allclose(m, expected_matrix)
 
+        pi_lc_mut = np.array([1.0, 0.0])
+        expected_matrix = np.array([[1, 0.4, 0.6], [0, 0, 0], [0, -1, 1]])
+        m = get_site_projection_matrix(pi_lc, lda, pi_lc_mut=pi_lc_mut)
+        assert np.allclose(m, expected_matrix)
+
     def test_kron_matvec(self):
         matrices = [np.random.normal(size=(3, 2))] * 2
         m = np.kron(*matrices)
@@ -36,6 +44,22 @@ class UtilsTests(unittest.TestCase):
         u1 = m @ v
         u2 = kron_matvec(matrices, v)
         assert np.allclose(u1, u2)
+
+    def test_kron_matvec_nan_input(self):
+        matrices = [np.random.normal(size=(3, 2))] * 2
+        m = np.kron(*matrices)
+        v = np.random.normal(size=m.shape[1])
+        v[0] = np.nan
+        with self.assertRaises(ValueError):
+            kron_matvec(matrices, v)
+
+    def test_kron_matvec_inf_input(self):
+        matrices = [np.random.normal(size=(3, 2))] * 2
+        m = np.kron(*matrices)
+        v = np.random.normal(size=m.shape[1])
+        v[0] = np.inf
+        with self.assertRaises(ValueError):
+            kron_matvec(matrices, v)
 
     def test_get_all_seqs(self):
         alphabet_list = [["A", "B"], ["A", "B"]]
@@ -1039,6 +1063,149 @@ class TestNamedAlphabetsDict(unittest.TestCase):
         self.assertEqual(dna_chars[1], "C")
         self.assertEqual(dna_chars[2], "G")
         self.assertEqual(dna_chars[3], "T")
+
+
+class TestSubsequences(unittest.TestCase):
+    """Test utilities for subsequence generation."""
+
+    def test_get_orbits_subsequences(self):
+        orbits = [(0, 1)]
+        alphabet = ["A", "B", "C"]
+        alphabet_list = [alphabet] * 3
+        subsequences = get_orbits_subsequences(orbits, alphabet_list)
+        exp = ["AA*", "AB*", "AC*", "BA*", "BB*", "BC*", "CA*", "CB*", "CC*"]
+        assert subsequences == exp
+
+        # Using wild-type reference
+        subsequences = get_orbits_subsequences(
+            orbits, alphabet_list, wt_seq="AAA"
+        )
+        exp = ["BB*", "BC*", "CB*", "CC*"]
+        assert subsequences == exp
+
+    def test_get_suborbits_subsequences(self):
+        orbit = (0, 1)
+        orbits = [(), (0,), (1,), (0, 1)]
+        alphabet = ["A", "B", "C"]
+        alphabet_list = [alphabet] * 3
+        subsequences = get_suborbits_subsequences(orbit, alphabet_list)
+        assert len(subsequences) == 4**2
+
+        subseqs2 = set(get_orbits_subsequences(orbits, alphabet_list))
+        assert subseqs2.intersection(set(subsequences)) == set(subseqs2)
+
+        # Using wild-type reference
+        subsequences = get_suborbits_subsequences(
+            orbit, alphabet_list, wt_seq="AAA"
+        )
+        exp = ["***", "*B*", "*C*", "B**", "BB*", "BC*", "C**", "CB*", "CC*"]
+        assert subsequences == exp
+
+        subseqs2 = set(
+            get_orbits_subsequences(orbits, alphabet_list, wt_seq="AAA")
+        )
+        assert subseqs2.intersection(set(subsequences)) == set(subseqs2)
+
+
+class TestBasis(unittest.TestCase):
+    """Test utilities for constructing specific basis
+    for sequence-function relationships."""
+
+    def test_get_background_averaged_basis_invalid_inputs(self):
+        alphabet = ["A", "B", "C"]
+        configs = [
+            {"encoding": "wild-type"},
+            {"encoding": "background-averaged", "wt_seq": "A"},
+            {"encoding": "background-averaged", "alphabet_list": "A"},
+            {
+                "encoding": "background-averaged",
+                "wt_seq": "A",
+                "alphabet_list": [alphabet] * 2,
+            },
+            {
+                "encoding": "background-averaged",
+                "wt_seq": "",
+                "alphabet_list": [alphabet],
+            },
+            {"encoding": "fourier", "wt_seq": "A"},
+            {
+                "encoding": "fourier",
+                "wt_seq": "A",
+                "alphabet_list": [alphabet],
+                "pi_lc": [np.array([0, 1, 0.0])],
+            },
+            {
+                "encoding": "fourier",
+                "wt_seq": "AA",
+                "alphabet_list": [alphabet],
+            },
+        ]
+
+        for kwargs in configs:
+            with self.assertRaises(ValueError):
+                get_position_basis(**kwargs)
+
+    def test_get_background_averaged_basis(self):
+        alphabet_list = [["A", "B", "C"]]
+        basis = get_position_basis(
+            encoding="background-averaged",
+            wt_seq="A",
+            alphabet_list=alphabet_list,
+        )[0]
+        assert np.allclose(
+            basis,
+            [
+                [1, -1 / 3.0, -1 / 3.0],
+                [1, 2 / 3.0, -1 / 3.0],
+                [1, -1 / 3.0, 2 / 3.0],
+            ],
+        )
+
+        f = np.array([2, 0, 1])
+        coeffs = np.linalg.solve(basis, f)
+        assert np.allclose(coeffs, [1, -2, -1])
+
+    def test_get_pi_background_averaged_basis(self):
+        alphabet_list = [["A", "B", "C"]]
+        basis = get_position_basis(
+            encoding="background-averaged",
+            wt_seq="A",
+            pi_lc=[np.array([0.5, 0.3, 0.2])],
+            alphabet_list=alphabet_list,
+        )[0]
+        assert np.allclose(
+            basis, [[1, -0.3, -0.2], [1, 0.7, -0.2], [1, -0.3, 0.8]]
+        )
+
+        f = np.array([2, 0, 1])
+        coeffs = np.linalg.solve(basis, f)
+        assert np.allclose(coeffs, [1.2, -2, -1])
+
+    def test_get_fourier_basis(self):
+        alphabet_list = [["A", "B", "C"]]
+        basis = get_position_basis(
+            encoding="fourier",
+            wt_seq="A",
+            alphabet_list=alphabet_list,
+        )[0]
+
+        # Ensure it is an orthonormal basis
+        assert np.allclose(basis.T @ basis, np.eye(3))
+
+        # Ensure it is the expected basis
+        expected = np.array(
+            [
+                [0.57735027, 0.57735027, 0.57735027],
+                [0.57735027, 0.21132487, -0.78867513],
+                [0.57735027, -0.78867513, 0.21132487],
+            ]
+        )
+        assert np.allclose(basis, expected)
+
+        # Ensure that the basis can reconstruct the coefficients
+        f = np.array([2, 0, 1])
+        coeffs = np.linalg.solve(basis, f)
+        assert np.allclose(coeffs, basis @ f)
 
 
 if __name__ == "__main__":

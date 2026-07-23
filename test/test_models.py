@@ -22,7 +22,7 @@ class TestModels(unittest.TestCase):
         model.set_random_params()
         self.model = model
         self.seqs = ["AAA", "AAC", "AAG", "AAT", "CCA", "CCG", "TTT"]
-        self.all_seqs = [''.join(x) for x in product(list('ACGT'), repeat=3)]
+        self.all_seqs = ["".join(x) for x in product(list("ACGT"), repeat=3)]
 
     def test_model(self):
         """Test model initialization."""
@@ -74,6 +74,7 @@ class TestModels(unittest.TestCase):
             positions=positions,
             generating_orbits=orbits,
         )
+        print(model.features)
         self.assertGreater(model.n_orbits, len(orbits))
         self.assertTrue(set(orbits).issubset(set(model.get_orbits())))
 
@@ -322,9 +323,7 @@ class TestModels(unittest.TestCase):
 
         with self.assertRaises(KeyError):
             theta = np.random.normal(size=model.n_features)
-            theta = pd.Series(
-                theta, index=model.features[:-1] + [((-1,), "A")]
-            )
+            theta = pd.Series(theta, index=model.features[:-1] + [((-1,), "A")])
             model.set_params(theta)
 
         with self.assertRaises(ValueError):
@@ -455,17 +454,31 @@ class TestGaugeFixing(unittest.TestCase):
 
     def test_get_fixed_params_dense_matrix(self):
         """Test gauge fixing"""
-        model = PairwiseModel(alphabet_name="dna", L=4)
+        model = AllOrderModel(alphabet_name="dna", L=4)
         model.set_random_params()
-        theta_original = model.theta.copy()
-        theta_fixed1 = model.get_fixed_params(
-            gauge="zero-sum", use_dense_matrix=True
-        )
-        model.set_params(theta_original)
-        theta_fixed2 = model.get_fixed_params(
-            gauge="zero-sum", use_dense_matrix=False
-        )
-        assert np.allclose(theta_fixed1, theta_fixed2)
+
+        pi_lc = [
+            np.array([0.25, 0.25, 0.25, 0.25]),
+            np.array([0.1, 0.2, 0.3, 0.4]),
+            np.array([0.4, 0.3, 0.2, 0.1]),
+            np.array([0.4, 0.3, 0.2, 0.1]),
+        ]
+        gauges = [
+            {"gauge": "zero-sum"},
+            {"gauge": "wild-type", "wt_seq": "AAAA"},
+            {"gauge": "trivial"},
+            {"gauge": "euclidean"},
+            {"gauge": "equitable"},
+            {"gauge": "hierarchical", "pi_lc": pi_lc},
+            {"lda": 10.0, "pi_lc": pi_lc},
+        ]
+        for gauge in gauges:
+            gauge["use_dense_matrix"] = False
+            theta_fixed1 = model.get_fixed_params(**gauge)
+
+            gauge["use_dense_matrix"] = True
+            theta_fixed2 = model.get_fixed_params(**gauge)
+            assert np.allclose(theta_fixed1, theta_fixed2)
 
     def test_get_fixed_params_hierarchical_models(self):
         """Test gauge fixing in hierarchical models"""
@@ -595,6 +608,31 @@ class TestGaugeFixing(unittest.TestCase):
             for kwargs in gauges:
                 with self.assertRaises((AssertionError, TypeError)):
                     model.get_fixed_params(**kwargs)
+
+
+class TestBasisChange(unittest.TestCase):
+    def test_get_basis_coeffs(self):
+        wt_seq = "AA"
+        model = AllOrderModel(alphabet=["A", "B"], L=2)
+        f = pd.Series([0, 1, 1, 2.0], index=["AA", "AB", "BA", "BB"])
+        model.set_landscape(f)
+        coeffs = model.get_basis_coeffs(
+            basis_name="background-averaged", wt_seq=wt_seq
+        )
+        assert np.allclose(coeffs, [1, 1, 1, 0.0])
+
+        wt_seq = "AAA"
+        model = AllOrderModel(alphabet=["A", "B"], L=3)
+        f = pd.Series(
+            [0, 1, 1, 2.0, 1, 2.5, 2.5, 4],
+            index=["AAA", "ABA", "BAA", "BBA", "AAB", "ABB", "BAB", "BBB"],
+        )
+        model.set_landscape(f)
+        coeffs = model.get_basis_coeffs(
+            basis_name="background-averaged", wt_seq=wt_seq
+        )
+        print(coeffs)
+        assert np.allclose(coeffs, [1, 1, 1, 0.0])
 
 
 if __name__ == "__main__":

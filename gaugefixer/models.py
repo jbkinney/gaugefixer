@@ -7,12 +7,15 @@ import pandas as pd
 import gaugefixer.docstrings as docs
 
 from gaugefixer.encoder import BinarySequenceEncoder
-from gaugefixer.fixer import GaugeFixer
+from gaugefixer.fixer import GaugeFixer, ParameterProjector
 from gaugefixer.utils import (
     get_orbits_features,
     get_subsets_of_multiple_sets,
     validate_alphabet_params,
     get_all_seqs,
+    get_position_basis,
+    get_generating_orbits_param_idx,
+    get_orbits_subsequences,
 )
 
 
@@ -157,9 +160,7 @@ class HierarchicalModel(object):
 
         self.pos_to_idx = {pos: i for i, pos in enumerate(self.positions)}
 
-    def _set_orbits(
-        self, generating_orbits: list[tuple] | None = None
-    ) -> None:
+    def _set_orbits(self, generating_orbits: list[tuple] | None = None) -> None:
         """
         Set the orbits of the linear model and defines the associated features.
 
@@ -275,6 +276,116 @@ class HierarchicalModel(object):
         theta_values = np.random.normal(size=self.n_features)
         theta = pd.Series(theta_values, index=self.features)
         self.theta = theta
+
+    def set_basis_coeffs(
+        self,
+        coeffs: pd.Series | pd.DataFrame,
+        basis_name: str,
+        wt_seq: str,
+        pi_lc: list[np.ndarray] | None = None,
+    ) -> None:
+        """
+        Define the values of the model parameters theta from basis coefficients.
+
+        Parameters
+        ----------
+        coeffs : pd.Series of shape (n_features,)
+            Coefficients associated to the basis vectors.
+        basis_name : str
+            Name of the basis to use from `background-averaged` and `fourier`.
+        wt_seq : str
+            Wild-type sequence to use for basis conversion.
+        pi_lc : list of np.ndarray or None, optional
+            Probability of each character at each position
+            used in the `background-average` epistasis basis.
+        """
+        position_basis = get_position_basis(
+            encoding=basis_name,
+            wt_seq=wt_seq,
+            pi_lc=pi_lc,
+            position_basis=None,
+            alphabet_list=self.alphabet_list,
+        )
+        Ps1 = [
+            np.vstack([np.ones((1, alpha)), np.eye(alpha)])
+            for alpha in self.alphas
+        ]
+        pi_lc, lda = self.fixer._get_pi_lc_lda(gauge="zero-sum")
+        Ps2 = self.fixer._get_site_P(pi_lc, lda)
+        Ps = [P2 @ P1 @ B for P1, P2, B in zip(Ps1, Ps2, position_basis)]
+
+        idx = get_generating_orbits_param_idx(
+            self.generating_orbits,
+            self.alphabet_list,
+            wt_seq=wt_seq,
+        )
+        generating_orbits_param_idx = {
+            k: (v, self.fixer.generating_orbits_param_idx[k])
+            for k, v in idx.items()
+        }
+        project = ParameterProjector(
+            generating_orbits_param_idx, Ps=Ps, use_dense_matrix=False
+        )
+        theta = pd.Series(project(coeffs), index=self.features)
+        self.set_params(theta)
+
+    def get_basis_coeffs(
+        self,
+        basis_name: str | None = None,
+        wt_seq: str | None = None,
+        pi_lc: list[np.ndarray] | None = None,
+    ) -> None:
+        """
+        Define the values of the model parameters theta from basis coefficients.
+
+        Parameters
+        ----------
+        basis_name : str, optional
+            Name of the basis to use from `background-averaged` and `fourier`.
+            If None, `position_basis` must be provided.
+        wt_seq : str, optional
+            Wild-type sequence to use for basis conversion.
+            Required if `basis_name` is provided.
+        pi_lc : list of np.ndarray or None, optional
+            Probability of each character at each position
+            used in the `background-average` epistasis basis.
+
+        Returns
+        -------
+        coeffs : pd.Series of shape (n_features,)
+            Coefficients associated to the basis vectors.
+        """
+        position_basis = get_position_basis(
+            encoding=basis_name,
+            wt_seq=wt_seq,
+            pi_lc=pi_lc,
+            position_basis=None,
+            alphabet_list=self.alphabet_list,
+        )
+        Xs = [
+            np.hstack([np.ones((alpha, 1)), np.eye(alpha)])
+            for alpha in self.alphas
+        ]
+        Ps = [np.linalg.solve(B, X) for X, B in zip(Xs, position_basis)]
+        idx = get_generating_orbits_param_idx(
+            self.generating_orbits,
+            self.alphabet_list,
+            wt_seq=wt_seq,
+        )
+        generating_orbits_param_idx = {
+            k: (self.fixer.generating_orbits_param_idx[k], v)
+            for k, v in idx.items()
+        }
+        project = ParameterProjector(
+            generating_orbits_param_idx, Ps=Ps, use_dense_matrix=False
+        )
+        coeffs = project(self.theta.values)
+        subseqs = get_orbits_subsequences(
+            self.generating_orbits, self.alphabet_list, wt_seq=wt_seq
+        )
+        print(coeffs, subseqs, Ps)
+        coeffs = pd.Series(coeffs, index=subseqs)
+        return coeffs
 
     def _calc_generating_orbits(self) -> list[tuple]:
         """
@@ -448,6 +559,19 @@ class AllOrderModel(HierarchicalModel):
 
     set_landscape.__doc__ = set_landscape.__doc__.format(f=docs.F)  # type: ignore
 
+    def get_landscape(self) -> pd.Series:
+        """
+        Returns the model landscape as a pandas Series indexed by sequences.
+
+        Returns
+        -------
+        {f}
+        """
+        seqs = get_all_seqs(self.alphabet_list)
+        return pd.Series(self.__call__(seqs), index=seqs)
+
+    get_landscape.__doc__ = get_landscape.__doc__.format(f=docs.F)  # type: ignore
+
     def _calc_generating_orbits(self) -> list[tuple]:
         """
         Get the generating orbits of the all-orders model.
@@ -604,9 +728,7 @@ class KadjacentModel(HierarchicalModel):
         )
 
     def _calc_generating_orbits(self):
-        return [
-            tuple(range(i, i + self.K)) for i in range(self.L - self.K + 1)
-        ]
+        return [tuple(range(i, i + self.K)) for i in range(self.L - self.K + 1)]
 
 
 class NeighborModel(KadjacentModel):

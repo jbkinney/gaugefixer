@@ -68,7 +68,7 @@ def is_visible_ascii(char):
 
 
 def get_site_projection_matrix(
-    pi_lc: np.ndarray, lda: float = np.inf
+    pi_lc: np.ndarray, lda: float = np.inf, pi_lc_mut: np.ndarray | None = None
 ) -> np.ndarray:
     """
     Compute the site-specific projection matrix into the gauge space.
@@ -80,6 +80,9 @@ def get_site_projection_matrix(
     lda : float, optional
         A parameter that controls the scaling of the projection. Defaults to
         infinity (`np.inf`), which results in a specific scaling behavior.
+    pi_lc_mut : np.ndarray | None, optional
+        Position-specific frequencies against which to compute allelic effects.
+        If None, the standard background frequencies are used.
 
     Returns
     -------
@@ -100,10 +103,17 @@ def get_site_projection_matrix(
         else:
             eta = lda / (1 + lda)
 
+    if pi_lc_mut is None:
+        pi_lc_mut = pi_lc.copy()
+    elif pi_lc_mut.shape != pi_lc.shape:
+        raise ValueError(
+            f"pi_lc_mut shape {pi_lc_mut.shape} does not match pi_lc shape {pi_lc.shape}"
+        )
+
     alpha = pi_lc.shape[0]
     P0x = eta * pi_lc
     Px0 = np.full((alpha, 1), 1 - eta)
-    Pxx = np.eye(alpha) - eta * np.expand_dims(pi_lc, axis=0)
+    Pxx = np.eye(alpha) - eta * np.expand_dims(pi_lc_mut, axis=0)
     P = np.vstack([np.hstack([eta, P0x]), np.hstack([Px0, Pxx])])
 
     # Check for numerical issues
@@ -230,23 +240,25 @@ def kron_matvec(matrices: list[np.ndarray], vector: np.ndarray) -> np.ndarray:
     u_tensor = vector.reshape(tensor_shape + [num_vectors])
     for i, mat in enumerate(matrices):
         u_tensor = tensordot(mat, u_tensor, i)
-    
+
     # Transpose all dimensions except the last one (num_vectors) to reverse their order
     # This is needed to match the Kronecker product structure
     # u_tensor has shape (m1, m2, ..., mk, num_vectors)
     # We want to reverse the order of m1, ..., mk while keeping num_vectors last
     k = len(matrices)
-    axes_permutation = list(range(k-1, -1, -1)) + [k]
+    axes_permutation = list(range(k - 1, -1, -1)) + [k]
     u_tensor = u_tensor.transpose(axes_permutation)
-    
+
     # Flatten all spatial dimensions, keeping num_vectors as the last dimension
     # Result shape: (m, num_vectors) where m = m1 * m2 * ... * mk
     m_int = int(m)
     u = u_tensor.reshape(m_int, num_vectors)
 
     # Final check for numerical issues in result
-    if np.any(np.isnan(u)) or np.any(np.isinf(u)):
-        u = np.nan_to_num(u, nan=0.0, posinf=0.0, neginf=0.0)
+    if np.any(np.isnan(u)):
+        raise ValueError("Resulting vector contains NaN")
+    if np.any(np.isinf(u)):
+        raise ValueError("Resulting vector contains infinite values")
 
     # Denormalize output if input was 1D
     if was_1d:
@@ -544,7 +556,10 @@ def get_orbits_features(
 
 @typechecked
 def get_orbits_subsequences(
-    orbits: list[tuple], alphabet_list: list[list[str]], wildcard: str = "*"
+    orbits: list[tuple],
+    alphabet_list: list[list[str]],
+    wildcard: str = "*",
+    wt_seq: str | None = None,
 ) -> list[str]:
     """
     Build features for given orbits using the provided alphabets.
@@ -557,7 +572,11 @@ def get_orbits_subsequences(
     alphabet_list : list[list[str]]
         List of per-position alphabets; alphabet_list[i] is the list of
         allowed characters at position i.
-    wildcard : str
+    wildcard : str, optional
+        Character to use as a wildcard for subsequences. Default is '*'.
+    wt_seq : str or None, optional
+        Wild-type alleles will be used as reference and replaced by the
+        wildcard characters. Default is None.
 
     Returns
     -------
@@ -566,16 +585,90 @@ def get_orbits_subsequences(
     """
     subseqs = []
     L = len(alphabet_list)
+    if wt_seq is None:
+        alphabet_list_copy = alphabet_list.copy()
+    else:
+        alphabet_list_copy = [
+            [c for c in alphabet if c != wt]
+            for alphabet, wt in zip(alphabet_list, wt_seq)
+        ]
+
     for orbit in orbits:
         if len(orbit) == 0:
             subseqs.append(wildcard * L)
         else:
             alphabets = [
                 alphabet if p in orbit else ["*"]
-                for p, alphabet in enumerate(alphabet_list)
+                for p, alphabet in enumerate(alphabet_list_copy)
             ]
             subseqs.extend(get_all_seqs(alphabets))
     return subseqs
+
+
+def get_suborbits_subsequences(
+    orbit: tuple,
+    alphabet_list: list[list[str]],
+    wildcard: str = "*",
+    wt_seq: str | None = None,
+) -> list[str]:
+    """
+    Generate subsequences within a given orbit.
+
+    Parameters
+    ----------
+    orbit : tuple
+        Tuple of site indices defining the orbit (e.g., (i, j, ...)).
+    alphabet_list: list of list of str
+        List of per-position alphabets; alphabet_list[i] is the list of
+        allowed characters at position i.
+    wildcard : str, optional
+        Character to use as a wildcard for suborbits. Default is '*'.
+    wt_seq : str or None, optional
+        Wild-type alleles will be used as reference and replaced by the
+        wildcard characters.
+
+    Returns
+    -------
+    list[str]
+        List of subsequences for the orbit. Each subsequence is a string
+        representing a combination of alleles (or wildcards) at the specified sites.
+    """
+    if wt_seq is None:
+        alphabets = [
+            [wildcard] + alphabet if p in orbit else [wildcard]
+            for p, alphabet in enumerate(alphabet_list)
+        ]
+    else:
+        alphabets = [
+            [c if c != wt_seq[p] else wildcard for c in alphabet]
+            if p in orbit
+            else [wildcard]
+            for p, alphabet in enumerate(alphabet_list)
+        ]
+    subseqs = get_all_seqs(alphabets)
+    return subseqs
+
+
+def get_generating_orbits_param_idx(
+    generating_orbits: list[tuple],
+    alphabet_list: list[list[str]],
+    wt_seq: str | None = None,
+) -> dict:
+    orbits = get_subsets_of_multiple_sets(generating_orbits)
+    subseqs = get_orbits_subsequences(orbits, alphabet_list, wt_seq=wt_seq)
+    subsequence_idx = dict(zip(subseqs, np.arange(len(subseqs))))
+    generating_orbits_param_idx = {}
+    for orbit in generating_orbits:
+        orbit_subseqs = get_suborbits_subsequences(
+            orbit, alphabet_list, wt_seq=wt_seq
+        )
+        idx = np.fromiter(
+            (subsequence_idx[s] for s in orbit_subseqs),
+            dtype=np.int64,
+        )
+        generating_orbits_param_idx[orbit] = idx
+
+    return generating_orbits_param_idx
 
 
 def get_all_seqs(alphabet_list, seqs=[""]):
@@ -591,3 +684,118 @@ def get_all_seqs(alphabet_list, seqs=[""]):
         new_seqs.extend([c + s for s in seqs])
 
     return get_all_seqs(alphabet_list[:-1], seqs=new_seqs)
+
+
+def get_position_basis(
+    encoding: str | None = None,
+    wt_seq: str | None = None,
+    pi_lc: list[np.ndarray] | None = None,
+    position_basis: list[np.ndarray] | None = None,
+    alphabet_list: list[list[str]] | None = None,
+):
+    """
+    Get the position basis for the given encoding and wild-type sequence
+    to be used as reference or the provided `position_basis`.
+    """
+    # Check input validity
+    if (
+        encoding is not None
+        and wt_seq is not None
+        and position_basis is None
+        and alphabet_list is not None
+    ):
+        if len(wt_seq) != len(alphabet_list):
+            raise ValueError(
+                f"Length of wt_seq ({len(wt_seq)}) does not match length of alphabet_list ({len(alphabet_list)})"
+            )
+        for c, alphabet in zip(wt_seq, alphabet_list):
+            if c not in alphabet:
+                raise ValueError(
+                    f"Character '{c}' in wt_seq is not in the corresponding alphabet {alphabet}"
+                )
+
+        if encoding == "background-averaged":
+            # Check validity of pi_lc
+            if pi_lc is None:
+                pi_lc = [
+                    np.array([1 / len(alphabet)] * len(alphabet))
+                    for alphabet in alphabet_list
+                ]
+            else:
+                if len(pi_lc) != len(alphabet_list):
+                    raise ValueError(
+                        f"Length of pi_lc ({len(pi_lc)}) does not match length of alphabet_list ({len(alphabet_list)})"
+                    )
+                for i, (pi, alphabet) in enumerate(zip(pi_lc, alphabet_list)):
+                    if len(pi) != len(alphabet):
+                        raise ValueError(
+                            f"Length of pi_lc[{i}] ({len(pi)}) does not match length of alphabet_list[{i}] ({len(alphabet)})"
+                        )
+                    if not np.isclose(np.sum(pi), 1.0):
+                        raise ValueError(
+                            f"pi_lc[{i}] does not sum to 1: sum={np.sum(pi)}"
+                        )
+
+            # from Faure et al. 2024 and Tsui et al. 2026
+            position_basis = []
+            for c, alphabet, pi_l in zip(wt_seq, alphabet_list, pi_lc):
+                alpha = len(alphabet)
+                i = alphabet.index(c)
+                basis_inv = np.zeros((alpha + 1, alpha + 1))
+                basis_inv[0] = 1.0 / alpha
+                basis_inv[1:, 1:] = np.eye(alpha)
+                basis_inv[1:, i + 1] -= 1
+                idx = np.arange(alpha + 1) != (i + 1)
+                basis_inv = basis_inv[idx, 1:]
+                basis_inv[0] = pi_l
+
+                basis = np.linalg.inv(basis_inv)
+                position_basis.append(basis)
+
+        elif encoding == "fourier":  # from Brookes et al. 2022
+            position_basis = []
+
+            if pi_lc is not None:
+                raise ValueError(
+                    "pi_lc should not be provided for 'fourier' encoding"
+                )
+
+            for c, alphabet in zip(wt_seq, alphabet_list):
+                alpha = len(alphabet)
+                sqrt_alpha = np.sqrt(alpha)
+                i = alphabet.index(c)
+
+                e_i = np.zeros(alpha)
+                e_i[i] = sqrt_alpha
+                w = np.ones(alpha) - e_i
+                basis = np.eye(alpha) - 2 * np.outer(w, w) / np.dot(w, w)
+                position_basis.append(basis)
+        else:
+            raise ValueError(
+                f"Invalid encoding '{encoding}'; must be 'background-averaged' or 'fourier'"
+            )
+    elif (
+        encoding is None
+        and wt_seq is None
+        and pi_lc is None
+        and position_basis is not None
+        and alphabet_list is not None
+    ):
+        # Check basis validity
+        for pos, (alphabet, basis) in enumerate(
+            zip(alphabet_list, position_basis)
+        ):
+            alpha = len(alphabet)
+            if basis.shape != (alpha, alpha):
+                raise ValueError(
+                    f"Position basis shape {basis.shape} does not match expected shape {(alpha, alpha)} for alphabet {alphabet} at position {pos}"
+                )
+            if np.linalg.matrix_rank(basis) != alpha:
+                raise ValueError(
+                    f"Position basis at position {pos} is not full rank"
+                )
+    else:
+        raise ValueError(
+            "Invalid combination of inputs: must provide either (encoding, wt_seq, alphabet_list) or (position_basis, alphabet_list)"
+        )
+    return position_basis
