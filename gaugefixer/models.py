@@ -307,10 +307,10 @@ class HierarchicalModel(object):
             alphabet_list=self.alphabet_list,
         )
         Ps1 = [
-            np.vstack([np.ones((1, alpha)), np.eye(alpha)])
+            np.vstack([np.zeros((1, alpha)), np.eye(alpha)])
             for alpha in self.alphas
         ]
-        pi_lc, lda = self.fixer._get_pi_lc_lda(gauge="zero-sum")
+        pi_lc, lda = self.fixer._get_pi_lc_lda(gauge="zero-sum") # type: ignore
         Ps2 = self.fixer._get_site_P(pi_lc, lda)
         Ps = [P2 @ P1 @ B for P1, P2, B in zip(Ps1, Ps2, position_basis)]
 
@@ -326,7 +326,12 @@ class HierarchicalModel(object):
         project = ParameterProjector(
             generating_orbits_param_idx, Ps=Ps, use_dense_matrix=False
         )
-        theta = pd.Series(project(coeffs), index=self.features)
+        
+        coeffs_names = get_orbits_features(
+            self.orbits, self.alphabet_list, wt_seq=wt_seq
+        )
+        coeffs_values = coeffs.loc[coeffs_names].values
+        theta = pd.Series(project(coeffs_values), index=self.features)
         self.set_params(theta)
 
     def get_basis_coeffs(
@@ -334,7 +339,7 @@ class HierarchicalModel(object):
         basis_name: str | None = None,
         wt_seq: str | None = None,
         pi_lc: list[np.ndarray] | None = None,
-    ) -> None:
+    ) -> pd.Series:
         """
         Define the values of the model parameters theta from basis coefficients.
 
@@ -367,6 +372,7 @@ class HierarchicalModel(object):
             for alpha in self.alphas
         ]
         Ps = [np.linalg.solve(B, X) for X, B in zip(Xs, position_basis)]
+        
         idx = get_generating_orbits_param_idx(
             self.generating_orbits,
             self.alphabet_list,
@@ -380,11 +386,10 @@ class HierarchicalModel(object):
             generating_orbits_param_idx, Ps=Ps, use_dense_matrix=False
         )
         coeffs = project(self.theta.values)
-        subseqs = get_orbits_subsequences(
-            self.generating_orbits, self.alphabet_list, wt_seq=wt_seq
+        coeffs_names = get_orbits_features(
+            self.orbits, self.alphabet_list, wt_seq=wt_seq
         )
-        print(coeffs, subseqs, Ps)
-        coeffs = pd.Series(coeffs, index=subseqs)
+        coeffs = pd.Series(coeffs, index=coeffs_names)
         return coeffs
 
     def _calc_generating_orbits(self) -> list[tuple]:

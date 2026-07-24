@@ -1067,7 +1067,6 @@ class TestNamedAlphabetsDict(unittest.TestCase):
 
 class TestSubsequences(unittest.TestCase):
     """Test utilities for subsequence generation."""
-
     def test_get_orbits_subsequences(self):
         orbits = [(0, 1)]
         alphabet = ["A", "B", "C"]
@@ -1081,6 +1080,21 @@ class TestSubsequences(unittest.TestCase):
             orbits, alphabet_list, wt_seq="AAA"
         )
         exp = ["BB*", "BC*", "CB*", "CC*"]
+        assert subsequences == exp
+    
+    def test_get_orbits_subsequences_wt_binary(self):
+        orbits = [(0, 1)]
+        alphabet = ["A", "B"]
+        alphabet_list = [alphabet] * 3
+        subsequences = get_orbits_subsequences(orbits, alphabet_list, wt_seq="AAA")
+        exp = ["BB*"]
+        assert subsequences == exp
+        
+        orbits = [(0, 1)]
+        alphabet = ["A", "B"]
+        alphabet_list = [alphabet] * 3
+        subsequences = get_orbits_subsequences(orbits, alphabet_list, wt_seq="AAA")
+        exp = ["BB*"]
         assert subsequences == exp
 
     def test_get_suborbits_subsequences(self):
@@ -1206,7 +1220,8 @@ class TestBasis(unittest.TestCase):
         f = np.array([2, 0, 1])
         coeffs = np.linalg.solve(basis, f)
         assert np.allclose(coeffs, basis @ f)
-
+        assert np.allclose(f, basis @ coeffs)
+        
 
 if __name__ == "__main__":
     import sys

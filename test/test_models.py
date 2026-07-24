@@ -8,9 +8,9 @@ import pandas as pd
 from gaugefixer.models import (
     AdditiveModel,
     AllOrderModel,
+    HierarchicalModel,
     KadjacentModel,
     KorderModel,
-    HierarchicalModel,
     NeighborModel,
     PairwiseModel,
 )
@@ -323,7 +323,9 @@ class TestModels(unittest.TestCase):
 
         with self.assertRaises(KeyError):
             theta = np.random.normal(size=model.n_features)
-            theta = pd.Series(theta, index=model.features[:-1] + [((-1,), "A")])
+            theta = pd.Series(
+                theta, index=model.features[:-1] + [((-1,), "A")]
+            )
             model.set_params(theta)
 
         with self.assertRaises(ValueError):
@@ -611,15 +613,15 @@ class TestGaugeFixing(unittest.TestCase):
 
 
 class TestBasisChange(unittest.TestCase):
-    def test_get_basis_coeffs(self):
+    def test_get_background_averaged_coeffs(self):
         wt_seq = "AA"
         model = AllOrderModel(alphabet=["A", "B"], L=2)
-        f = pd.Series([0, 1, 1, 2.0], index=["AA", "AB", "BA", "BB"])
+        f = pd.Series([0, 1, 2, 3.0], index=["AA", "AB", "BA", "BB"])
         model.set_landscape(f)
         coeffs = model.get_basis_coeffs(
             basis_name="background-averaged", wt_seq=wt_seq
         )
-        assert np.allclose(coeffs, [1, 1, 1, 0.0])
+        assert np.allclose(coeffs, [1.5, 2.0, 1, 0.0])
 
         wt_seq = "AAA"
         model = AllOrderModel(alphabet=["A", "B"], L=3)
@@ -631,8 +633,82 @@ class TestBasisChange(unittest.TestCase):
         coeffs = model.get_basis_coeffs(
             basis_name="background-averaged", wt_seq=wt_seq
         )
-        print(coeffs)
-        assert np.allclose(coeffs, [1, 1, 1, 0.0])
+        assert np.allclose(coeffs, [1.75, 1.25, 1.25, 1.5, 0, 0.5, 0.5, 0.0])
+
+    def test_set_background_averaged_coeffs(self):
+        wt_seq = "AA"
+        model = AllOrderModel(alphabet=["A", "B"], L=2)
+        coeffs_names = [
+            ((), ""),
+            ((0,), "A>B"),
+            ((1,), "A>B"),
+            ((0, 1), "A>B;A>B"),
+        ]
+        coeffs = pd.Series([1, 1, 1, 0], index=coeffs_names)
+        model.set_basis_coeffs(
+            coeffs, basis_name="background-averaged", wt_seq=wt_seq
+        )
+        f = model.get_landscape()
+        assert np.allclose(f, [0, 1, 1, 2.0])
+
+        wt_seq = "AAA"
+        model = AllOrderModel(alphabet=["A", "B"], L=3)
+        coeffs_names = [
+            ((), ""),
+            ((0,), "A>B"),
+            ((1,), "A>B"),
+            ((2,), "A>B"),
+            ((0, 1), "A>B;A>B"),
+            ((0, 2), "A>B;A>B"),
+            ((1, 2), "A>B;A>B"),
+            ((0, 1, 2), "A>B;A>B;A>B"),
+        ]
+        coeffs = pd.Series([1.75, 1.25, 1.25, 1.5, 0, 0.5, 0.5, 0.0], index=coeffs_names)
+        model.set_basis_coeffs(
+            coeffs, basis_name="background-averaged", wt_seq=wt_seq
+        )
+        f = model.get_landscape()
+        seqs = ["AAA", "ABA", "BAA", "BBA", "AAB", "ABB", "BAB", "BBB"]
+        assert np.allclose(f.loc[seqs], [0, 1, 1, 2.0, 1, 2.5, 2.5, 4])
+    
+    def test_get_set_basis_coeffs(self):
+        L = 5
+        model = AllOrderModel(alphabet_name="dna", L=L)
+        model.set_random_params()
+        f1 = model.get_landscape()
+        
+        wt_seqs = [''.join(x) for x in np.random.choice(model.alphabet, size=(5, L))]
+        for basis_name in ["background-averaged", "fourier"]:
+            print(basis_name)
+            for wt_seq in wt_seqs:    
+                coeffs = model.get_basis_coeffs(
+                    basis_name=basis_name, wt_seq=wt_seq
+                )
+                model.set_basis_coeffs(
+                    coeffs, basis_name=basis_name, wt_seq=wt_seq
+                )
+                f2 = model.get_landscape()
+                assert np.allclose(f1, f2)
+
+    def test_get_fourier_coeffs(self):
+        wt_seq = "AA"
+        model = AllOrderModel(alphabet=["A", "B"], L=2)
+        f = pd.Series([0, 1, 2, 3.0], index=["AA", "AB", "BA", "BB"])
+        model.set_landscape(f)
+        coeffs = model.get_basis_coeffs(basis_name="fourier", wt_seq=wt_seq)
+        assert np.allclose(coeffs / np.sqrt(4), [1.5, -1, -0.5, 0.0])
+
+        wt_seq = "AAA"
+        model = AllOrderModel(alphabet=["A", "B"], L=3)
+        f = pd.Series(
+            [0, 1, 1, 2.0, 1, 2.5, 2.5, 4],
+            index=["AAA", "ABA", "BAA", "BBA", "AAB", "ABB", "BAB", "BBB"],
+        )
+        model.set_landscape(f)
+        coeffs = model.get_basis_coeffs(basis_name="fourier", wt_seq=wt_seq)
+        assert np.allclose(
+            coeffs / np.sqrt(8), [1.75, -0.625, -0.625, -0.75, 0., 0.125, 0.125, 0.0]
+        )
 
 
 if __name__ == "__main__":

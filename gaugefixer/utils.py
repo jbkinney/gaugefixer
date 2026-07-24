@@ -522,7 +522,9 @@ def get_subsets_of_multiple_sets(sets: list[tuple]) -> list[tuple]:
 
 @typechecked
 def get_orbits_features(
-    orbits: list[tuple], alphabet_list: list[list[str]]
+    orbits: list[tuple],
+    alphabet_list: list[list[str]],
+    wt_seq: str | None = None,
 ) -> list[tuple]:
     """
     Build features for given orbits using the provided alphabets.
@@ -535,6 +537,8 @@ def get_orbits_features(
     alphabet_list : list[list[str]]
         List of per-position alphabets; alphabet_list[i] is the list of
         allowed characters at position i.
+    wt_seq : str or None, optional
+        Wild-type alleles will be used as reference for defining features.
 
     Returns
     -------
@@ -549,8 +553,19 @@ def get_orbits_features(
         if len(orbit) == 0:
             features.append(((), ""))
         else:
-            alphabets = [alphabet_list[i] for i in orbit]
-            features.extend([(orbit, s) for s in get_all_seqs(alphabets)])
+            if wt_seq is None:
+                alphabets = [alphabet_list[i] for i in orbit]
+                features.extend([(orbit, s) for s in get_all_seqs(alphabets)])
+            else:
+                alphabets = [
+                    [
+                        f"{wt_seq[i]}>{c}"
+                        for c in alphabet_list[i]
+                        if c != wt_seq[i]
+                    ]
+                    for i in orbit
+                ]
+                features.extend([(orbit, s) for s in get_all_seqs(alphabets, sep=';')])
     return features
 
 
@@ -671,19 +686,19 @@ def get_generating_orbits_param_idx(
     return generating_orbits_param_idx
 
 
-def get_all_seqs(alphabet_list, seqs=[""]):
+def get_all_seqs(alphabet_list, seqs=[""], sep=''):
     if len(alphabet_list) == 0:
         return seqs
     elif len(alphabet_list) > 100:
-        return ["".join(x) for x in product(*alphabet_list)]
+        return [sep.join(x) for x in product(*alphabet_list)]
 
     alphabet = alphabet_list[-1]
 
     new_seqs = []
     for c in alphabet:
-        new_seqs.extend([c + s for s in seqs])
+        new_seqs.extend([c + sep + s if s else c + s for s in seqs])
 
-    return get_all_seqs(alphabet_list[:-1], seqs=new_seqs)
+    return get_all_seqs(alphabet_list[:-1], seqs=new_seqs, sep=sep)
 
 
 def get_position_basis(
