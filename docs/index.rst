@@ -26,6 +26,18 @@ a software package for quantitative modeling of sequence-function relationships.
 out of the need for a comprehensive, efficient, and user-friendly set of tools for fixing the gauge
 in a way that is independent of the specific implementation of the model.
 
+Alternative parametrizations
+============================
+
+``GaugeFixer`` focuses on generalized one-hot representations of sequence-function relationships. However, previous works
+have also proposed alternative approaches by constructing explicit families of bases for sequences, such that the associated coefficients are
+uniquely determined by the underlying sequence-function relationship and do not have gauge freedoms. These alternative
+parametrizations include the classical Walsh-Hadamard basis (`Weinberger (1991) <https://dl.acm.org/doi/10.1007/BF00216965>`_) and several generalizations
+(`Brookes et al. (2022) <https://www.pnas.org/doi/10.1073/pnas.2109649118>`_,
+`Faure et al. (2024) <https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1012132>`_,
+`Tsui et al. (2026) <https://www.biorxiv.org/content/10.64898/2026.07.08.737351v1.full.pdf>`_). ``GaugeFixer`` provides a simple interface to convert between
+the generalized one-hot representation and these alternative parametrizations, allowing users to choose the most suitable representation for their specific application.
+
 Installation
 ============
 
