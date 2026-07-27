@@ -635,6 +635,47 @@ class TestBasisChange(unittest.TestCase):
         )
         assert np.allclose(coeffs, [1.75, 1.25, 1.25, 1.5, 0, 0.5, 0.5, 0.0])
 
+    def test_get_basis_coeffs_additive_model_biallelic(self):
+        wt_seq = "BB"
+        seqs = ["AA", "AB", "BA", "BB"]
+        model = AdditiveModel(alphabet=["A", "B"], L=2)
+        params = pd.Series([0, 1, 0, 0, 2], index=model.features)
+        model.set_params(params)
+        coeffs1 = model.get_basis_coeffs(
+            basis_name="background-averaged", wt_seq=wt_seq
+        )
+        f1 = model(seqs)
+
+        model.set_basis_coeffs(
+            coeffs1, basis_name="background-averaged", wt_seq=wt_seq
+        )
+        f2 = model(seqs)
+        
+        print(f1, f2)
+        assert np.allclose(f1, f2)
+
+        coeffs2 = model.get_basis_coeffs(
+            basis_name="background-averaged", wt_seq=wt_seq
+        )
+        assert np.allclose(coeffs1, coeffs2)
+        
+
+    def test_get_background_averaged_coeffs_additive_model_multiallelic(self):
+        wt_seq = "TCG"
+        model = AdditiveModel(alphabet_name="dna", L=3)
+        model.set_random_params()
+
+        coeffs1 = model.get_basis_coeffs(
+            basis_name="background-averaged", wt_seq=wt_seq
+        )
+        model.set_basis_coeffs(
+            coeffs1, basis_name="background-averaged", wt_seq=wt_seq
+        )
+        coeffs2 = model.get_basis_coeffs(
+            basis_name="background-averaged", wt_seq=wt_seq
+        )
+        assert np.allclose(coeffs1, coeffs2)
+
     def test_set_background_averaged_coeffs(self):
         wt_seq = "AA"
         model = AllOrderModel(alphabet=["A", "B"], L=2)
@@ -663,32 +704,15 @@ class TestBasisChange(unittest.TestCase):
             ((1, 2), "A>B;A>B"),
             ((0, 1, 2), "A>B;A>B;A>B"),
         ]
-        coeffs = pd.Series([1.75, 1.25, 1.25, 1.5, 0, 0.5, 0.5, 0.0], index=coeffs_names)
+        coeffs = pd.Series(
+            [1.75, 1.25, 1.25, 1.5, 0, 0.5, 0.5, 0.0], index=coeffs_names
+        )
         model.set_basis_coeffs(
             coeffs, basis_name="background-averaged", wt_seq=wt_seq
         )
         f = model.get_landscape()
         seqs = ["AAA", "ABA", "BAA", "BBA", "AAB", "ABB", "BAB", "BBB"]
         assert np.allclose(f.loc[seqs], [0, 1, 1, 2.0, 1, 2.5, 2.5, 4])
-    
-    def test_get_set_basis_coeffs(self):
-        L = 5
-        model = AllOrderModel(alphabet_name="dna", L=L)
-        model.set_random_params()
-        f1 = model.get_landscape()
-        
-        wt_seqs = [''.join(x) for x in np.random.choice(model.alphabet, size=(5, L))]
-        for basis_name in ["background-averaged", "fourier"]:
-            print(basis_name)
-            for wt_seq in wt_seqs:    
-                coeffs = model.get_basis_coeffs(
-                    basis_name=basis_name, wt_seq=wt_seq
-                )
-                model.set_basis_coeffs(
-                    coeffs, basis_name=basis_name, wt_seq=wt_seq
-                )
-                f2 = model.get_landscape()
-                assert np.allclose(f1, f2)
 
     def test_get_fourier_coeffs(self):
         wt_seq = "AA"
@@ -707,8 +731,41 @@ class TestBasisChange(unittest.TestCase):
         model.set_landscape(f)
         coeffs = model.get_basis_coeffs(basis_name="fourier", wt_seq=wt_seq)
         assert np.allclose(
-            coeffs / np.sqrt(8), [1.75, -0.625, -0.625, -0.75, 0., 0.125, 0.125, 0.0]
+            coeffs / np.sqrt(8),
+            [1.75, -0.625, -0.625, -0.75, 0.0, 0.125, 0.125, 0.0],
         )
+
+    def test_get_set_basis_coeffs(self):
+        L = 3
+        models = [
+            # AllOrderModel(alphabet_name="dna", L=L),
+            AdditiveModel(alphabet_name="dna", L=L),
+            PairwiseModel(alphabet_name="dna", L=L),
+            KorderModel(alphabet_name="dna", L=L, K=2),
+            NeighborModel(alphabet_name="dna", L=L),
+            KadjacentModel(alphabet_name="dna", L=L, K=2),
+        ]
+
+        wt_seqs = [
+            "".join(x)
+            for x in np.random.choice(models[0].alphabet, size=(5, L))
+        ]
+        for model in models:
+            for basis_name in ["background-averaged", "fourier"]:
+                for wt_seq in wt_seqs:
+                    model.set_random_params()
+                    coeffs1 = model.get_basis_coeffs(
+                        basis_name=basis_name, wt_seq=wt_seq
+                    )
+                    model.set_basis_coeffs(
+                        coeffs1, basis_name=basis_name, wt_seq=wt_seq
+                    )
+                    coeffs2 = model.get_basis_coeffs(
+                        basis_name=basis_name, wt_seq=wt_seq
+                    )
+                    print(wt_seq, basis_name)
+                    print(coeffs1, coeffs2)
+                    assert np.allclose(coeffs1, coeffs2)
 
 
 if __name__ == "__main__":

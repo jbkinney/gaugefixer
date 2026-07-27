@@ -1166,6 +1166,7 @@ class TestBasis(unittest.TestCase):
             wt_seq="A",
             alphabet_list=alphabet_list,
         )[0]
+        print(basis)
         assert np.allclose(
             basis,
             [
@@ -1178,6 +1179,27 @@ class TestBasis(unittest.TestCase):
         f = np.array([2, 0, 1])
         coeffs = np.linalg.solve(basis, f)
         assert np.allclose(coeffs, [1, -2, -1])
+        
+        # Alternative reference
+        basis = get_position_basis(
+                    encoding="background-averaged",
+                    wt_seq="B",
+                    alphabet_list=alphabet_list,
+                )[0]
+        print(basis)
+        assert np.allclose(
+            basis,
+            [
+                [1, 2 / 3.0, -1 / 3.0],
+                [1, -1 / 3.0, -1 / 3.0],
+                [1, -1 / 3.0, 2 / 3.0],
+            ],
+        )
+
+        f = np.array([2, 0, 1])
+        coeffs = np.linalg.solve(basis, f)
+        assert np.allclose(coeffs, [1, -2, -1])
+        
 
     def test_get_pi_background_averaged_basis(self):
         alphabet_list = [["A", "B", "C"]]
