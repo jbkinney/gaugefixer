@@ -74,7 +74,6 @@ class TestModels(unittest.TestCase):
             positions=positions,
             generating_orbits=orbits,
         )
-        print(model.features)
         self.assertGreater(model.n_orbits, len(orbits))
         self.assertTrue(set(orbits).issubset(set(model.get_orbits())))
 
@@ -323,9 +322,7 @@ class TestModels(unittest.TestCase):
 
         with self.assertRaises(KeyError):
             theta = np.random.normal(size=model.n_features)
-            theta = pd.Series(
-                theta, index=model.features[:-1] + [((-1,), "A")]
-            )
+            theta = pd.Series(theta, index=model.features[:-1] + [((-1,), "A")])
             model.set_params(theta)
 
         with self.assertRaises(ValueError):
@@ -650,15 +647,13 @@ class TestBasisChange(unittest.TestCase):
             coeffs1, basis_name="background-averaged", wt_seq=wt_seq
         )
         f2 = model(seqs)
-        
-        print(f1, f2)
+
         assert np.allclose(f1, f2)
 
         coeffs2 = model.get_basis_coeffs(
             basis_name="background-averaged", wt_seq=wt_seq
         )
         assert np.allclose(coeffs1, coeffs2)
-        
 
     def test_get_background_averaged_coeffs_additive_model_multiallelic(self):
         wt_seq = "TCG"
@@ -736,36 +731,52 @@ class TestBasisChange(unittest.TestCase):
         )
 
     def test_get_set_basis_coeffs(self):
-        L = 3
+        L = 4
         models = [
-            # AllOrderModel(alphabet_name="dna", L=L),
+            AllOrderModel(alphabet_name="dna", L=L),
             AdditiveModel(alphabet_name="dna", L=L),
             PairwiseModel(alphabet_name="dna", L=L),
             KorderModel(alphabet_name="dna", L=L, K=2),
             NeighborModel(alphabet_name="dna", L=L),
             KadjacentModel(alphabet_name="dna", L=L, K=2),
         ]
+        seqs = ["".join(x) for x in product(list("ACGT"), repeat=L)]
 
-        wt_seqs = [
+        wt_seqs1 = [
+            "".join(x)
+            for x in np.random.choice(models[0].alphabet, size=(5, L))
+        ]
+        wt_seqs2 = [
             "".join(x)
             for x in np.random.choice(models[0].alphabet, size=(5, L))
         ]
         for model in models:
             for basis_name in ["background-averaged", "fourier"]:
-                for wt_seq in wt_seqs:
+                for wt_seq1, wt_seq2 in zip(wt_seqs1, wt_seqs2):
                     model.set_random_params()
+                    f1 = model(seqs)
                     coeffs1 = model.get_basis_coeffs(
-                        basis_name=basis_name, wt_seq=wt_seq
+                        basis_name=basis_name, wt_seq=wt_seq1
                     )
                     model.set_basis_coeffs(
-                        coeffs1, basis_name=basis_name, wt_seq=wt_seq
+                        coeffs1, basis_name=basis_name, wt_seq=wt_seq1
                     )
+                    f2 = model(seqs)
+                    assert np.allclose(f1, f2)
+
                     coeffs2 = model.get_basis_coeffs(
-                        basis_name=basis_name, wt_seq=wt_seq
+                        basis_name=basis_name, wt_seq=wt_seq1
                     )
-                    print(wt_seq, basis_name)
-                    print(coeffs1, coeffs2)
                     assert np.allclose(coeffs1, coeffs2)
+
+                    coeffs3 = model.get_basis_coeffs(
+                        basis_name=basis_name, wt_seq=wt_seq2
+                    )
+                    model.set_basis_coeffs(
+                        coeffs3, basis_name=basis_name, wt_seq=wt_seq2
+                    )
+                    f2 = model(seqs)
+                    assert np.allclose(f1, f2)
 
 
 if __name__ == "__main__":

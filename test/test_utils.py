@@ -1067,6 +1067,7 @@ class TestNamedAlphabetsDict(unittest.TestCase):
 
 class TestSubsequences(unittest.TestCase):
     """Test utilities for subsequence generation."""
+
     def test_get_orbits_subsequences(self):
         orbits = [(0, 1)]
         alphabet = ["A", "B", "C"]
@@ -1081,19 +1082,23 @@ class TestSubsequences(unittest.TestCase):
         )
         exp = ["BB*", "BC*", "CB*", "CC*"]
         assert subsequences == exp
-    
+
     def test_get_orbits_subsequences_wt_binary(self):
         orbits = [(0, 1)]
         alphabet = ["A", "B"]
         alphabet_list = [alphabet] * 3
-        subsequences = get_orbits_subsequences(orbits, alphabet_list, wt_seq="AAA")
+        subsequences = get_orbits_subsequences(
+            orbits, alphabet_list, wt_seq="AAA"
+        )
         exp = ["BB*"]
         assert subsequences == exp
-        
+
         orbits = [(0, 1)]
         alphabet = ["A", "B"]
         alphabet_list = [alphabet] * 3
-        subsequences = get_orbits_subsequences(orbits, alphabet_list, wt_seq="AAA")
+        subsequences = get_orbits_subsequences(
+            orbits, alphabet_list, wt_seq="AAA"
+        )
         exp = ["BB*"]
         assert subsequences == exp
 
@@ -1128,28 +1133,28 @@ class TestBasis(unittest.TestCase):
     def test_get_background_averaged_basis_invalid_inputs(self):
         alphabet = ["A", "B", "C"]
         configs = [
-            {"encoding": "wild-type"},
-            {"encoding": "background-averaged", "wt_seq": "A"},
-            {"encoding": "background-averaged", "alphabet_list": "A"},
+            {"basis_name": "wild-type"},
+            {"basis_name": "background-averaged", "wt_seq": "A"},
+            {"basis_name": "background-averaged", "alphabet_list": "A"},
             {
-                "encoding": "background-averaged",
+                "basis_name": "background-averaged",
                 "wt_seq": "A",
                 "alphabet_list": [alphabet] * 2,
             },
             {
-                "encoding": "background-averaged",
+                "basis_name": "background-averaged",
                 "wt_seq": "",
                 "alphabet_list": [alphabet],
             },
-            {"encoding": "fourier", "wt_seq": "A"},
+            {"basis_name": "fourier", "wt_seq": "A"},
             {
-                "encoding": "fourier",
+                "basis_name": "fourier",
                 "wt_seq": "A",
                 "alphabet_list": [alphabet],
                 "pi_lc": [np.array([0, 1, 0.0])],
             },
             {
-                "encoding": "fourier",
+                "basis_name": "fourier",
                 "wt_seq": "AA",
                 "alphabet_list": [alphabet],
             },
@@ -1162,11 +1167,10 @@ class TestBasis(unittest.TestCase):
     def test_get_background_averaged_basis(self):
         alphabet_list = [["A", "B", "C"]]
         basis = get_position_basis(
-            encoding="background-averaged",
+            basis_name="background-averaged",
             wt_seq="A",
             alphabet_list=alphabet_list,
         )[0]
-        print(basis)
         assert np.allclose(
             basis,
             [
@@ -1179,32 +1183,48 @@ class TestBasis(unittest.TestCase):
         f = np.array([2, 0, 1])
         coeffs = np.linalg.solve(basis, f)
         assert np.allclose(coeffs, [1, -2, -1])
-        
+
         # Alternative reference
         basis = get_position_basis(
-                    encoding="background-averaged",
-                    wt_seq="B",
-                    alphabet_list=alphabet_list,
-                )[0]
-        print(basis)
+            basis_name="background-averaged",
+            wt_seq="B",
+            alphabet_list=alphabet_list,
+        )[0]
         assert np.allclose(
             basis,
             [
-                [1, 2 / 3.0, -1 / 3.0],
-                [1, -1 / 3.0, -1 / 3.0],
-                [1, -1 / 3.0, 2 / 3.0],
+                [2 / 3.0, 1, -1 / 3.0],
+                [-1 / 3.0, 1, -1 / 3.0],
+                [-1 / 3.0, 1, 2 / 3.0],
             ],
         )
 
         f = np.array([2, 0, 1])
         coeffs = np.linalg.solve(basis, f)
-        assert np.allclose(coeffs, [1, -2, -1])
-        
+        assert np.allclose(coeffs, [2, 1, 1])
+
+        basis = get_position_basis(
+            basis_name="background-averaged",
+            wt_seq="C",
+            alphabet_list=alphabet_list,
+        )[0]
+        assert np.allclose(
+            basis,
+            [
+                [2 / 3.0, -1 / 3.0, 1],
+                [-1 / 3.0, 2 / 3.0, 1],
+                [-1 / 3.0, -1 / 3.0, 1],
+            ],
+        )
+
+        f = np.array([2, 0, 1])
+        coeffs = np.linalg.solve(basis, f)
+        assert np.allclose(coeffs, [1, -1, 1])
 
     def test_get_pi_background_averaged_basis(self):
         alphabet_list = [["A", "B", "C"]]
         basis = get_position_basis(
-            encoding="background-averaged",
+            basis_name="background-averaged",
             wt_seq="A",
             pi_lc=[np.array([0.5, 0.3, 0.2])],
             alphabet_list=alphabet_list,
@@ -1220,7 +1240,7 @@ class TestBasis(unittest.TestCase):
     def test_get_fourier_basis(self):
         alphabet_list = [["A", "B", "C"]]
         basis = get_position_basis(
-            encoding="fourier",
+            basis_name="fourier",
             wt_seq="A",
             alphabet_list=alphabet_list,
         )[0]
@@ -1243,7 +1263,7 @@ class TestBasis(unittest.TestCase):
         coeffs = np.linalg.solve(basis, f)
         assert np.allclose(coeffs, basis @ f)
         assert np.allclose(f, basis @ coeffs)
-        
+
 
 if __name__ == "__main__":
     import sys

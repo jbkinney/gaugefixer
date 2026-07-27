@@ -565,7 +565,9 @@ def get_orbits_features(
                     ]
                     for i in orbit
                 ]
-                features.extend([(orbit, s) for s in get_all_seqs(alphabets, sep=';')])
+                features.extend(
+                    [(orbit, s) for s in get_all_seqs(alphabets, sep=";")]
+                )
     return features
 
 
@@ -686,7 +688,7 @@ def get_generating_orbits_param_idx(
     return generating_orbits_param_idx
 
 
-def get_all_seqs(alphabet_list, seqs=[""], sep=''):
+def get_all_seqs(alphabet_list, seqs=[""], sep=""):
     if len(alphabet_list) == 0:
         return seqs
     elif len(alphabet_list) > 100:
@@ -702,7 +704,7 @@ def get_all_seqs(alphabet_list, seqs=[""], sep=''):
 
 
 def get_position_basis(
-    encoding: str | None = None,
+    basis_name: str | None = None,
     wt_seq: str | None = None,
     pi_lc: list[np.ndarray] | None = None,
     position_basis: list[np.ndarray] | None = None,
@@ -711,10 +713,32 @@ def get_position_basis(
     """
     Get the position basis for the given encoding and wild-type sequence
     to be used as reference or the provided `position_basis`.
+
+    Parameters
+    ----------
+    basis_name : str
+        Name of the basis to use from `background-averaged` and `fourier`.
+    wt_seq : str
+        Wild-type sequence to use for basis conversion.
+    pi_lc : list of np.ndarray or None, optional
+        Probability of each character at each position
+        used in the `background-average` epistasis basis.
+    position_basis : list of np.ndarray, optional
+        List of position-specific basis matrices. Must be provided if `basis_name` is None.
+    alphabet_list : list of list of str, optional
+        List of alphabets, where each alphabet is a list of characters to sample
+        from for that specific position. The length of ``alphabet_list`` determines
+        the sequence length.
+
+    Returns
+    -------
+    list of np.ndarray
+        List of position-specific basis matrices. Each matrix has shape (alpha, alpha),
+        where alpha is the number of characters in the corresponding site-specific alphabet.
     """
     # Check input validity
     if (
-        encoding is not None
+        basis_name is not None
         and wt_seq is not None
         and position_basis is None
         and alphabet_list is not None
@@ -729,7 +753,7 @@ def get_position_basis(
                     f"Character '{c}' in wt_seq is not in the corresponding alphabet {alphabet}"
                 )
 
-        if encoding == "background-averaged":
+        if basis_name == "background-averaged":
             # Check validity of pi_lc
             if pi_lc is None:
                 pi_lc = [
@@ -756,18 +780,14 @@ def get_position_basis(
             for c, alphabet, pi_l in zip(wt_seq, alphabet_list, pi_lc):
                 alpha = len(alphabet)
                 i = alphabet.index(c)
-                basis_inv = np.zeros((alpha + 1, alpha + 1))
-                basis_inv[0] = 1.0 / alpha
-                basis_inv[1:, 1:] = np.eye(alpha)
-                basis_inv[1:, i + 1] -= 1
-                idx = np.arange(alpha + 1) != (i + 1)
-                basis_inv = basis_inv[idx, 1:]
-                basis_inv[0] = pi_l
+                basis_inv = np.eye(alpha)
+                basis_inv[:, i] -= 1
+                basis_inv[i] = pi_l
 
                 basis = np.linalg.inv(basis_inv)
                 position_basis.append(basis)
 
-        elif encoding == "fourier":  # from Brookes et al. 2022
+        elif basis_name == "fourier":  # from Brookes et al. 2022
             position_basis = []
 
             if pi_lc is not None:
@@ -787,10 +807,10 @@ def get_position_basis(
                 position_basis.append(basis)
         else:
             raise ValueError(
-                f"Invalid encoding '{encoding}'; must be 'background-averaged' or 'fourier'"
+                f"Invalid basis_name '{basis_name}'; must be 'background-averaged' or 'fourier'"
             )
     elif (
-        encoding is None
+        basis_name is None
         and wt_seq is None
         and pi_lc is None
         and position_basis is not None
@@ -811,6 +831,6 @@ def get_position_basis(
                 )
     else:
         raise ValueError(
-            "Invalid combination of inputs: must provide either (encoding, wt_seq, alphabet_list) or (position_basis, alphabet_list)"
+            "Invalid combination of inputs: must provide either (basis_name, wt_seq, alphabet_list) or (position_basis, alphabet_list)"
         )
     return position_basis

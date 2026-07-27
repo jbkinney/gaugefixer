@@ -300,7 +300,7 @@ class HierarchicalModel(object):
             used in the `background-average` epistasis basis.
         """
         position_basis = get_position_basis(
-            encoding=basis_name,
+            basis_name=basis_name,
             wt_seq=wt_seq,
             pi_lc=pi_lc,
             position_basis=None,
@@ -310,7 +310,7 @@ class HierarchicalModel(object):
             np.vstack([np.zeros((1, alpha)), np.eye(alpha)])
             for alpha in self.alphas
         ]
-        pi_lc, lda = self.fixer._get_pi_lc_lda(gauge="zero-sum") # type: ignore
+        pi_lc, lda = self.fixer._get_pi_lc_lda(gauge="zero-sum")  # type: ignore
         Ps2 = self.fixer._get_site_P(pi_lc, lda)
         Ps = [P2 @ P1 @ B for P1, P2, B in zip(Ps1, Ps2, position_basis)]
 
@@ -326,7 +326,7 @@ class HierarchicalModel(object):
         project = ParameterProjector(
             generating_orbits_param_idx, Ps=Ps, use_dense_matrix=False
         )
-        
+
         coeffs_names = get_orbits_features(
             self.orbits, self.alphabet_list, wt_seq=wt_seq
         )
@@ -361,7 +361,7 @@ class HierarchicalModel(object):
             Coefficients associated to the basis vectors.
         """
         position_basis = get_position_basis(
-            encoding=basis_name,
+            basis_name=basis_name,
             wt_seq=wt_seq,
             pi_lc=pi_lc,
             position_basis=None,
@@ -372,7 +372,7 @@ class HierarchicalModel(object):
             for alpha in self.alphas
         ]
         Ps = [np.linalg.solve(B, X) for X, B in zip(Xs, position_basis)]
-        
+
         idx = get_generating_orbits_param_idx(
             self.generating_orbits,
             self.alphabet_list,
