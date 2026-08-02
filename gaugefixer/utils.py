@@ -717,7 +717,8 @@ def get_position_basis(
     Parameters
     ----------
     basis_name : str
-        Name of the basis to use from `background-averaged` and `fourier`.
+        Name of the basis to use from `{'WH', 'eWH', 'background-averaged', 'fourier'}`.
+        Note that `{'WH', 'eWH'}` can only be computed for binary alphabets.
     wt_seq : str
         Wild-type sequence to use for basis conversion.
     pi_lc : list of np.ndarray or None, optional
@@ -791,9 +792,7 @@ def get_position_basis(
             position_basis = []
 
             if pi_lc is not None:
-                raise ValueError(
-                    "pi_lc should not be provided for 'fourier' encoding"
-                )
+                raise ValueError("'pi_lc' is incompatible with 'fourier' basis")
 
             for c, alphabet in zip(wt_seq, alphabet_list):
                 alpha = len(alphabet)
@@ -805,6 +804,15 @@ def get_position_basis(
                 w = np.ones(alpha) - e_i
                 basis = np.eye(alpha) - 2 * np.outer(w, w) / np.dot(w, w)
                 position_basis.append(basis)
+
+        elif basis_name == "WH":
+            if any(len(alphabet) != 2 for alphabet in alphabet_list):
+                raise ValueError(
+                    "WH basis can only be computed for binary alphabets"
+                )
+            if pi_lc is not None:
+                raise ValueError("'pi_lc' is incompatible with 'WH' basis")
+
         else:
             raise ValueError(
                 f"Invalid basis_name '{basis_name}'; must be 'background-averaged' or 'fourier'"
