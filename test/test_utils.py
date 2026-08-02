@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 import unittest
+from itertools import product
 
 import numpy as np
-
-from itertools import product
 from typeguard import TypeCheckError
+
 from gaugefixer.utils import (
+    get_all_seqs,
     get_orbits_features,
+    get_orbits_subsequences,
+    get_position_basis,
     get_site_projection_matrix,
+    get_suborbits_subsequences,
     get_subsets_of_multiple_sets,
     get_subsets_of_set,
     kron_matvec,
@@ -15,10 +19,6 @@ from gaugefixer.utils import (
     random_seqs,
     sorted_tuples,
     validate_alphabet_params,
-    get_all_seqs,
-    get_position_basis,
-    get_orbits_subsequences,
-    get_suborbits_subsequences,
 )
 
 
@@ -393,7 +393,9 @@ class TestRandomSeqs(unittest.TestCase):
 
     def test_random_seed_none(self):
         """Test that random_seed=None works (no seed set)."""
-        seqs = random_seqs(alphabet=["A", "C", "G", "T"], L=5, random_seed=None)
+        seqs = random_seqs(
+            alphabet=["A", "C", "G", "T"], L=5, random_seed=None
+        )
         self.assertEqual(len(seqs), 1)
         self.assertEqual(len(seqs[0]), 5)
 
@@ -706,7 +708,9 @@ class TestValidateAlphabetParams(unittest.TestCase):
     def test_custom_alphabet_zero_L(self):
         """Test custom alphabet with L=0."""
         with self.assertRaises(ValueError):
-            _, _, _, _ = validate_alphabet_params(alphabet=["A", "B", "C"], L=0)
+            _, _, _, _ = validate_alphabet_params(
+                alphabet=["A", "B", "C"], L=0
+            )
 
     def test_custom_alphabet_negative_L(self):
         """Test custom alphabet with negative L."""
@@ -887,7 +891,8 @@ class TestValidateAlphabetParams(unittest.TestCase):
         self.assertIsInstance(L, int)
         self.assertTrue(
             all(
-                isinstance(pos_alphabet, list) for pos_alphabet in alphabet_list
+                isinstance(pos_alphabet, list)
+                for pos_alphabet in alphabet_list
             )
         )
         self.assertTrue(
@@ -906,7 +911,8 @@ class TestValidateAlphabetParams(unittest.TestCase):
         self.assertIsInstance(L, int)
         self.assertTrue(
             all(
-                isinstance(pos_alphabet, list) for pos_alphabet in alphabet_list
+                isinstance(pos_alphabet, list)
+                for pos_alphabet in alphabet_list
             )
         )
         self.assertTrue(
@@ -925,7 +931,8 @@ class TestValidateAlphabetParams(unittest.TestCase):
         self.assertIsInstance(L, int)
         self.assertTrue(
             all(
-                isinstance(pos_alphabet, list) for pos_alphabet in alphabet_list
+                isinstance(pos_alphabet, list)
+                for pos_alphabet in alphabet_list
             )
         )
         self.assertTrue(
@@ -1263,6 +1270,91 @@ class TestBasis(unittest.TestCase):
         coeffs = np.linalg.solve(basis, f)
         assert np.allclose(coeffs, basis @ f)
         assert np.allclose(f, basis @ coeffs)
+
+    def test_WH_basis(self):
+        alphabet_list = [["A", "B", "C"]]
+
+        with self.assertRaises(ValueError):
+            get_position_basis(
+                basis_name="WH",
+                wt_seq="A",
+                alphabet_list=alphabet_list,
+            )
+
+        alphabet_list = [["A", "B"]]
+        basis = get_position_basis(
+            basis_name="WH",
+            wt_seq="A",
+            alphabet_list=alphabet_list,
+        )[0]
+        expected = np.array([[1., 1.], [1., -1.]]) / np.sqrt(2)
+        assert np.allclose(basis, expected)
+        
+        alphabet_list = [["A", "B"]]
+        basis = get_position_basis(
+            basis_name="WH",
+            wt_seq="B",
+            alphabet_list=alphabet_list,
+        )[0]
+        expected = np.array([[-1., 1.], [1., 1.]]) / np.sqrt(2)
+        assert np.allclose(basis, expected)
+    
+    def test_eWH_basis(self):
+        alphabet_list = [["A", "B", "C"]]
+
+        with self.assertRaises(ValueError):
+            get_position_basis(
+                basis_name="eWH",
+                wt_seq="A",
+                alphabet_list=alphabet_list,
+            )
+            
+        alphabet_list = [["A", "B"]]
+        pi_lc = [np.array([0.6, 0.4])]
+        with self.assertRaises(ValueError):
+            get_position_basis(
+                basis_name="eWH",
+                wt_seq="A",
+                alphabet_list=alphabet_list,
+            )
+
+        # Reference 1
+        basis = get_position_basis(
+            basis_name="eWH",
+            wt_seq="A",
+            alphabet_list=alphabet_list,
+            pi_lc=pi_lc,
+        )[0]
+        pi = pi_lc[0]   
+        denom = np.sqrt(np.prod(pi))
+        expected = np.array([[1, pi[1] / denom], [1, -pi[0] / denom]])
+        assert np.allclose(basis, expected)
+        
+        # Reference 1
+        alphabet_list = [["A", "B"]]
+        basis = get_position_basis(
+            basis_name="eWH",
+            wt_seq="B",
+            alphabet_list=alphabet_list,
+            pi_lc=pi_lc,
+        )[0]
+        expected = np.array([[-pi[1] / denom, 1], [pi[0] / denom, 1]])
+        assert np.allclose(basis, expected)
+        
+        # Check equivalence for pi_lc = 0.5 up to normalization
+        pi_lc = [np.array([0.5, 0.5])]
+        basis1 = get_position_basis(
+            basis_name="eWH",
+            wt_seq="B",
+            alphabet_list=alphabet_list,
+            pi_lc=pi_lc,
+        )[0]
+        basis2 = get_position_basis(
+            basis_name="WH",
+            wt_seq="B",
+            alphabet_list=alphabet_list,
+        )[0]
+        assert np.allclose(basis1 / basis2, np.sqrt(2))
 
 
 if __name__ == "__main__":

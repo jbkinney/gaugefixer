@@ -4,22 +4,21 @@ from itertools import combinations
 
 import numpy as np
 import pandas as pd
-import gaugefixer.docstrings as docs
 
+import gaugefixer.docstrings as docs
 from gaugefixer.encoder import BinarySequenceEncoder
 from gaugefixer.fixer import GaugeFixer, ParameterProjector
 from gaugefixer.utils import (
+    get_all_seqs,
+    get_generating_orbits_param_idx,
     get_orbits_features,
+    get_position_basis,
     get_subsets_of_multiple_sets,
     validate_alphabet_params,
-    get_all_seqs,
-    get_position_basis,
-    get_generating_orbits_param_idx,
-    get_orbits_subsequences,
 )
 
 
-class HierarchicalModel(object):
+class HierarchicalModel:
     __doc__ = f"""
     Linear hierarchical model for sequence-function relationships
 
@@ -292,7 +291,7 @@ class HierarchicalModel(object):
         coeffs : pd.Series of shape (n_features,)
             Coefficients associated to the basis vectors.
         basis_name : str
-            Name of the basis to use from `background-averaged` and `fourier`.
+            Name of the basis to use from `{'WH', 'eWH', 'background-averaged', 'fourier'}`.
         wt_seq : str
             Wild-type sequence to use for basis conversion.
         pi_lc : list of np.ndarray or None, optional
@@ -346,7 +345,7 @@ class HierarchicalModel(object):
         Parameters
         ----------
         basis_name : str, optional
-            Name of the basis to use from `background-averaged` and `fourier`.
+            Name of the basis to use from `{'WH', 'eWH', 'background-averaged', 'fourier'}`.
             If None, `position_basis` must be provided.
         wt_seq : str, optional
             Wild-type sequence to use for basis conversion.
@@ -446,18 +445,18 @@ class HierarchicalModel(object):
         description["n_orbits"] = self.n_orbits
 
         if hasattr(self, "K"):
-            description["K"] = getattr(self, "K")
+            description["K"] = self.K
         return description
 
     def __repr__(self) -> str:
         items = [
-            "{}={}".format(k, v) for k, v in self._get_description().items()
+            f"{k}={v}" for k, v in self._get_description().items()
         ]
         return f"{self.__class__.__name__}({','.join(items)})"
 
     def __str__(self) -> str:
         items = [
-            "\t{}={}".format(k, v) for k, v in self._get_description().items()
+            f"\t{k}={v}" for k, v in self._get_description().items()
         ]
         return "\n".join([f"{self.__class__.__name__}:", *items])
 

@@ -789,11 +789,10 @@ def get_position_basis(
                 position_basis.append(basis)
 
         elif basis_name == "fourier":  # from Brookes et al. 2022
-            position_basis = []
-
             if pi_lc is not None:
                 raise ValueError("'pi_lc' is incompatible with 'fourier' basis")
 
+            position_basis = []
             for c, alphabet in zip(wt_seq, alphabet_list):
                 alpha = len(alphabet)
                 sqrt_alpha = np.sqrt(alpha)
@@ -812,10 +811,44 @@ def get_position_basis(
                 )
             if pi_lc is not None:
                 raise ValueError("'pi_lc' is incompatible with 'WH' basis")
+            
+            position_basis = []
+            sqrt_alpha = np.sqrt(2)
+            for c, alphabet in zip(wt_seq, alphabet_list):
+                if c == alphabet[0]:
+                    basis = np.array([[1., 1.], [1., -1.]])
+                elif c == alphabet[1]:
+                    basis = np.array([[-1., 1.], [1., 1.]])
+                else:
+                    raise ValueError(
+                        f"Character '{c}' in wt_seq is not in the corresponding alphabet {alphabet}"
+                    )
+                basis /= sqrt_alpha
+                position_basis.append(basis)
+        
+        elif basis_name == "eWH":
+            if any(len(alphabet) != 2 for alphabet in alphabet_list):
+                raise ValueError(
+                    "eWH basis can only be computed for binary alphabets"
+                )
+            if pi_lc is None:
+                raise ValueError("'pi_lc' is required for 'eWH' basis")
+            
+            position_basis = []
+            for c, alphabet, pi_l in zip(wt_seq, alphabet_list, pi_lc):
+                i = alphabet.index(c)
+                denom = np.sqrt(np.prod(pi_l))
+                if i == 0:
+                    basis = np.array([[1, pi_l[1]/ denom],
+                                      [1, -pi_l[0]/ denom]])
+                else:
+                    basis = np.array([[-pi_l[1]/ denom, 1],
+                                      [pi_l[0]/ denom, 1]])
+                position_basis.append(basis)
 
         else:
             raise ValueError(
-                f"Invalid basis_name '{basis_name}'; must be 'background-averaged' or 'fourier'"
+                f"Invalid basis_name '{basis_name}'; must be one of {'WH', 'eWH', 'background-averaged', 'fourier'}]"
             )
     elif (
         basis_name is None

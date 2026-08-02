@@ -729,9 +729,56 @@ class TestBasisChange(unittest.TestCase):
             coeffs / np.sqrt(8),
             [1.75, -0.625, -0.625, -0.75, 0.0, 0.125, 0.125, 0.0],
         )
+    
+    def test_get_WH_coeffs(self):
+        wt_seq = "AA"
+        model = AllOrderModel(alphabet=["A", "B"], L=2)
+        f = pd.Series([0, 1, 2, 3.0], index=["AA", "AB", "BA", "BB"])
+        model.set_landscape(f)
+        coeffs = model.get_basis_coeffs(basis_name="WH", wt_seq=wt_seq)
+        assert np.allclose(coeffs, [3.0, -2.0, -1, 0.0])
+    
+    def test_set_WH_coeffs(self):
+        wt_seq = "AA"
+        model = AllOrderModel(alphabet=["A", "B"], L=2)
+        coeffs_names = [
+            ((), ""),
+            ((0,), "A>B"),
+            ((1,), "A>B"),
+            ((0, 1), "A>B;A>B"),
+        ]
+        coeffs = pd.Series([3.0, -2.0, -1, 0.0], index=coeffs_names)
+        model.set_basis_coeffs(coeffs, basis_name="WH", wt_seq=wt_seq)
+        f = model.get_landscape()
+        assert np.allclose(f, [0, 1, 2, 3.0])
+    
+    def test_get_eWH_coeffs(self):
+        wt_seq = "AA"
+        pi_lc = [np.array([0.6, 0.4]), np.array([0.4, 0.6])]
+        model = AllOrderModel(alphabet=["A", "B"], L=2)
+        f = pd.Series([0, 1, 2, 3.0], index=["AA", "AB", "BA", "BB"])
+        model.set_landscape(f)
+        coeffs = model.get_basis_coeffs(basis_name="eWH", wt_seq=wt_seq, pi_lc=pi_lc)
+        assert np.allclose(coeffs, [1.4, -0.9797959, -0.4898979, 0.0])
+    
+    def test_set_eWH_coeffs(self):
+        wt_seq = "AA"
+        pi_lc = [np.array([0.6, 0.4]), np.array([0.4, 0.6])]
+        model = AllOrderModel(alphabet=["A", "B"], L=2)
+        coeffs_names = [
+            ((), ""),
+            ((0,), "A>B"),
+            ((1,), "A>B"),
+            ((0, 1), "A>B;A>B"),
+        ]
+        coeffs = pd.Series([1.4, -0.9797959, -0.4898979, 0.0], index=coeffs_names)
+        model.set_basis_coeffs(coeffs, basis_name="eWH", wt_seq=wt_seq, pi_lc=pi_lc)
+        f = model.get_landscape()
+        assert np.allclose(f, [0, 1, 2, 3.0], atol=1e-4)
 
     def test_get_set_basis_coeffs(self):
         L = 4
+        alphabet_list = [list("AC")] * L
         models = [
             AllOrderModel(alphabet_name="dna", L=L),
             AdditiveModel(alphabet_name="dna", L=L),
@@ -739,41 +786,53 @@ class TestBasisChange(unittest.TestCase):
             KorderModel(alphabet_name="dna", L=L, K=2),
             NeighborModel(alphabet_name="dna", L=L),
             KadjacentModel(alphabet_name="dna", L=L, K=2),
-        ]
-        seqs = ["".join(x) for x in product(list("ACGT"), repeat=L)]
-
-        wt_seqs1 = [
-            "".join(x)
-            for x in np.random.choice(models[0].alphabet, size=(5, L))
-        ]
-        wt_seqs2 = [
-            "".join(x)
-            for x in np.random.choice(models[0].alphabet, size=(5, L))
+            
+            AllOrderModel(alphabet_list=alphabet_list, L=L),
+            AdditiveModel(alphabet_list=alphabet_list, L=L),
+            PairwiseModel(alphabet_list=alphabet_list, L=L),
+            KorderModel(alphabet_list=alphabet_list, L=L, K=2),
+            NeighborModel(alphabet_list=alphabet_list, L=L),
+            KadjacentModel(alphabet_list=alphabet_list, L=L, K=2),
+            
         ]
         for model in models:
-            for basis_name in ["background-averaged", "fourier"]:
+            seqs = ["".join(x) for x in product(*model.alphabet_list)]
+            wt_seqs1 = np.random.choice(seqs, size=5)
+            wt_seqs2 = np.random.choice(seqs, size=5)
+            
+            if np.all([len(alphabet) == 2 for alphabet in model.alphabet_list]):
+                basis_names = ["WH", 'eWH', "background-averaged", "fourier"]
+            else:
+                basis_names = ["background-averaged", "fourier"]
+                
+            for basis_name in basis_names:
+                if basis_name == "eWH":
+                    pi_lc = [np.random.dirichlet(np.ones(len(alphabet))) for alphabet in model.alphabet_list]
+                else:
+                    pi_lc = None
+                
                 for wt_seq1, wt_seq2 in zip(wt_seqs1, wt_seqs2):
                     model.set_random_params()
                     f1 = model(seqs)
                     coeffs1 = model.get_basis_coeffs(
-                        basis_name=basis_name, wt_seq=wt_seq1
+                        basis_name=basis_name, wt_seq=wt_seq1, pi_lc=pi_lc
                     )
                     model.set_basis_coeffs(
-                        coeffs1, basis_name=basis_name, wt_seq=wt_seq1
+                        coeffs1, basis_name=basis_name, wt_seq=wt_seq1, pi_lc=pi_lc
                     )
                     f2 = model(seqs)
                     assert np.allclose(f1, f2)
 
                     coeffs2 = model.get_basis_coeffs(
-                        basis_name=basis_name, wt_seq=wt_seq1
+                        basis_name=basis_name, wt_seq=wt_seq1, pi_lc=pi_lc
                     )
                     assert np.allclose(coeffs1, coeffs2)
 
                     coeffs3 = model.get_basis_coeffs(
-                        basis_name=basis_name, wt_seq=wt_seq2
+                        basis_name=basis_name, wt_seq=wt_seq2, pi_lc=pi_lc
                     )
                     model.set_basis_coeffs(
-                        coeffs3, basis_name=basis_name, wt_seq=wt_seq2
+                        coeffs3, basis_name=basis_name, wt_seq=wt_seq2, pi_lc=pi_lc
                     )
                     f2 = model(seqs)
                     assert np.allclose(f1, f2)
