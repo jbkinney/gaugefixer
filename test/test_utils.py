@@ -393,9 +393,7 @@ class TestRandomSeqs(unittest.TestCase):
 
     def test_random_seed_none(self):
         """Test that random_seed=None works (no seed set)."""
-        seqs = random_seqs(
-            alphabet=["A", "C", "G", "T"], L=5, random_seed=None
-        )
+        seqs = random_seqs(alphabet=["A", "C", "G", "T"], L=5, random_seed=None)
         self.assertEqual(len(seqs), 1)
         self.assertEqual(len(seqs[0]), 5)
 
@@ -708,9 +706,7 @@ class TestValidateAlphabetParams(unittest.TestCase):
     def test_custom_alphabet_zero_L(self):
         """Test custom alphabet with L=0."""
         with self.assertRaises(ValueError):
-            _, _, _, _ = validate_alphabet_params(
-                alphabet=["A", "B", "C"], L=0
-            )
+            _, _, _, _ = validate_alphabet_params(alphabet=["A", "B", "C"], L=0)
 
     def test_custom_alphabet_negative_L(self):
         """Test custom alphabet with negative L."""
@@ -891,8 +887,7 @@ class TestValidateAlphabetParams(unittest.TestCase):
         self.assertIsInstance(L, int)
         self.assertTrue(
             all(
-                isinstance(pos_alphabet, list)
-                for pos_alphabet in alphabet_list
+                isinstance(pos_alphabet, list) for pos_alphabet in alphabet_list
             )
         )
         self.assertTrue(
@@ -911,8 +906,7 @@ class TestValidateAlphabetParams(unittest.TestCase):
         self.assertIsInstance(L, int)
         self.assertTrue(
             all(
-                isinstance(pos_alphabet, list)
-                for pos_alphabet in alphabet_list
+                isinstance(pos_alphabet, list) for pos_alphabet in alphabet_list
             )
         )
         self.assertTrue(
@@ -931,8 +925,7 @@ class TestValidateAlphabetParams(unittest.TestCase):
         self.assertIsInstance(L, int)
         self.assertTrue(
             all(
-                isinstance(pos_alphabet, list)
-                for pos_alphabet in alphabet_list
+                isinstance(pos_alphabet, list) for pos_alphabet in alphabet_list
             )
         )
         self.assertTrue(
@@ -1287,18 +1280,18 @@ class TestBasis(unittest.TestCase):
             wt_seq="A",
             alphabet_list=alphabet_list,
         )[0]
-        expected = np.array([[1., 1.], [1., -1.]]) / np.sqrt(2)
+        expected = np.array([[1.0, 1.0], [1.0, -1.0]]) / np.sqrt(2)
         assert np.allclose(basis, expected)
-        
+
         alphabet_list = [["A", "B"]]
         basis = get_position_basis(
             basis_name="WH",
             wt_seq="B",
             alphabet_list=alphabet_list,
         )[0]
-        expected = np.array([[-1., 1.], [1., 1.]]) / np.sqrt(2)
+        expected = np.array([[-1.0, 1.0], [1.0, 1.0]]) / np.sqrt(2)
         assert np.allclose(basis, expected)
-    
+
     def test_eWH_basis(self):
         alphabet_list = [["A", "B", "C"]]
 
@@ -1308,9 +1301,11 @@ class TestBasis(unittest.TestCase):
                 wt_seq="A",
                 alphabet_list=alphabet_list,
             )
-            
+
         alphabet_list = [["A", "B"]]
-        pi_lc = [np.array([0.6, 0.4])]
+        pi = np.array([0.6, 0.4])
+        D_pi = np.diag(pi)
+        pi_lc = [pi]
         with self.assertRaises(ValueError):
             get_position_basis(
                 basis_name="eWH",
@@ -1325,11 +1320,11 @@ class TestBasis(unittest.TestCase):
             alphabet_list=alphabet_list,
             pi_lc=pi_lc,
         )[0]
-        pi = pi_lc[0]   
         denom = np.sqrt(np.prod(pi))
         expected = np.array([[1, pi[1] / denom], [1, -pi[0] / denom]])
         assert np.allclose(basis, expected)
-        
+        assert np.allclose(basis.T @ D_pi @ basis, np.eye(2))
+
         # Reference 1
         alphabet_list = [["A", "B"]]
         basis = get_position_basis(
@@ -1340,7 +1335,8 @@ class TestBasis(unittest.TestCase):
         )[0]
         expected = np.array([[-pi[1] / denom, 1], [pi[0] / denom, 1]])
         assert np.allclose(basis, expected)
-        
+        assert np.allclose(basis.T @ D_pi @ basis, np.eye(2))
+
         # Check equivalence for pi_lc = 0.5 up to normalization
         pi_lc = [np.array([0.5, 0.5])]
         basis1 = get_position_basis(
@@ -1355,6 +1351,7 @@ class TestBasis(unittest.TestCase):
             alphabet_list=alphabet_list,
         )[0]
         assert np.allclose(basis1 / basis2, np.sqrt(2))
+        assert np.allclose(basis.T @ D_pi @ basis, np.eye(2))
 
 
 if __name__ == "__main__":
