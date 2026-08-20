@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/1112550354.svg)](https://doi.org/10.5281/zenodo.22035761)
+
 # GaugeFixer
 
 GaugeFixer is a lightweight Python package that allows interpretation of the parameters of linear models for sequence-function relationships by removing unconstrained degrees of freedom in their values, an operation known as "fixing the gauge".
